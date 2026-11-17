@@ -1,0 +1,2154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lorenzo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: soft-glass phone UI. Warm gradient hero card on top, frosted white cards,
+   pill chips, dark gradient CTAs, bottom nav with a dark active tile. */
+:root{
+  --stage:#D8D5D2; --bg:#F2F0EE; --card:#FFFFFF; --card-soft:#E8E6E3;
+  --ink:#1D1B1A; --ink-dim:#7F7A75; --line:#E4E1DE;
+  --accent:#EF6A3A; --accent-soft:#FBDAC8; --accent-ink:#8C3512;
+  --dark-1:#4A4642; --dark-2:#171514; --on-dark:#FFFFFF;
+  --ok:#3E9E68; --ok-soft:#DDF0E4; --warn:#D2432B; --warn-bg:#FCE3DC;
+  --glass:rgba(255,255,255,.66); --glass-line:rgba(255,255,255,.8);
+  --hero-base:#E85F2E; --hero-1:#FFC4A0; --hero-2:#F2461A; --hero-3:#FF9A6B; --hero-4:#FFD9C0;
+  --shadow:0 10px 30px -14px rgba(60,35,20,.28);
+  --font-display:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --font-mono:'DM Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --stage:#0A0908; --bg:#131110; --card:#1F1C1B; --card-soft:#292523;
+    --ink:#F3EFEC; --ink-dim:#A59E98; --line:#35312E;
+    --accent:#F5835A; --accent-soft:#4A2A1C; --accent-ink:#FFC9B0;
+    --dark-1:#55504C; --dark-2:#2B2826;
+    --ok:#5BC48A; --ok-soft:#1F3A2B; --warn:#EE7A63; --warn-bg:#3C1E18;
+    --glass:rgba(48,43,40,.62); --glass-line:rgba(255,255,255,.1);
+    --hero-base:#B84620; --hero-1:#D2704A; --hero-2:#D3400F; --hero-3:#B5532F; --hero-4:#8A3A20;
+    --shadow:0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --stage:#0A0908; --bg:#131110; --card:#1F1C1B; --card-soft:#292523;
+  --ink:#F3EFEC; --ink-dim:#A59E98; --line:#35312E;
+  --accent:#F5835A; --accent-soft:#4A2A1C; --accent-ink:#FFC9B0;
+  --dark-1:#55504C; --dark-2:#2B2826;
+  --ok:#5BC48A; --ok-soft:#1F3A2B; --warn:#EE7A63; --warn-bg:#3C1E18;
+  --glass:rgba(48,43,40,.62); --glass-line:rgba(255,255,255,.1);
+  --hero-base:#B84620; --hero-1:#D2704A; --hero-2:#D3400F; --hero-3:#B5532F; --hero-4:#8A3A20;
+  --shadow:0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--stage);color:var(--ink);font-family:var(--font-body);display:flex;flex-direction:column;align-items:center}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,.ctype:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tnum{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+.shell{width:100%;max-width:430px;height:100%;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column}
+@media (min-width:480px){
+  body{padding-block:28px}
+  .shell{height:844px;border-radius:44px;box-shadow:0 40px 70px -24px rgba(30,15,5,.4),0 0 0 1px var(--line)}
+}
+.screen{display:none;flex-direction:column;flex:1;min-height:0}
+.screen.active{display:flex}
+.pad{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* Gradient used on splash, hero, meter card, art tiles */
+.warm{
+  background:
+    radial-gradient(60% 55% at 18% 18%,var(--hero-1) 0%,transparent 70%),
+    radial-gradient(70% 60% at 88% 38%,var(--hero-2) 0%,transparent 72%),
+    radial-gradient(55% 55% at 35% 105%,var(--hero-4) 0%,transparent 70%),
+    radial-gradient(40% 40% at 75% 0%,var(--hero-3) 0%,transparent 70%),
+    var(--hero-base);
+}
+
+/* Buttons */
+.btn{border:none;border-radius:999px;padding:16px 22px;font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-dark{color:var(--on-dark);background:linear-gradient(180deg,var(--dark-1),var(--dark-2));box-shadow:0 8px 18px -8px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.18)}
+.btn-glass{background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--ink)}
+.btn-sm{width:auto;padding:12px 20px;font-size:14px}
+.btn[disabled]{opacity:.8}
+.iconbtn{width:42px;height:42px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;flex:none;position:relative;color:var(--ink)}
+.iconbtn.on-warm{color:#fff;background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.35)}
+.foot{padding-top:10px;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+
+/* Splash */
+#screen-splash{justify-content:space-between;color:#fff}
+#screen-splash .mark{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;text-align:center}
+.sunmark{width:84px;height:84px}
+#screen-splash h1{font-size:44px;letter-spacing:-.03em;color:#fff;font-weight:700}
+#screen-splash .tag{opacity:.95;font-size:15.5px;max-width:250px;line-height:1.45}
+#screen-splash .foot{display:flex;flex-direction:column;gap:10px}
+#screen-splash .btn-glass{color:#fff;background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.35)}
+
+/* Onboarding */
+#screen-onboard{padding-top:calc(24px + env(safe-area-inset-top,0px))}
+.ob-slides{position:relative;flex:1;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.ob-slides.dragging{cursor:grabbing}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;justify-content:center;transition:transform .32s cubic-bezier(.22,.8,.3,1)}
+.ob-slides.dragging .ob-slide{transition:none}
+@media (prefers-reduced-motion: reduce){.ob-slide{transition:none}}
+.ob-art{width:196px;height:196px;border-radius:52px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.ob-art .ring{width:96px;height:96px;border-radius:999px;background:rgba(255,255,255,.26);border:1px solid rgba(255,255,255,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff}
+.ob-slide h2{font-size:26px;max-width:290px;font-weight:700}
+.ob-slide p{color:var(--ink-dim);font-size:15px;max-width:290px;line-height:1.5}
+.dots{display:flex;gap:7px;justify-content:center;padding:14px 0}
+.dot{width:8px;height:8px;border-radius:99px;background:var(--line);cursor:pointer;transition:width .2s,background .2s}
+.dot.active{background:var(--ink);width:24px}
+
+/* Top bar for stacked screens */
+.topbar{display:flex;align-items:center;gap:12px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:14px;position:sticky;top:0;background:var(--bg);z-index:5}
+.topbar h2{font-size:20px;font-weight:600}
+.stack-body{flex:1;overflow-y:auto;padding-bottom:20px}
+
+/* Form */
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.field label{font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;padding-left:6px}
+.field input,.field select{font-family:inherit;font-size:15.5px;padding:15px 18px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%;box-shadow:var(--shadow)}
+.hint{font-size:13px;color:var(--ink-dim);line-height:1.45}
+
+/* Connection cards */
+.ctype{border:2px solid transparent;border-radius:28px;padding:18px;margin-bottom:12px;background:var(--card);display:flex;gap:14px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
+.ctype.selected{border-color:var(--accent)}
+.ctype .radio{width:22px;height:22px;border-radius:99px;border:2px solid var(--line);flex:none;margin-top:2px;position:relative}
+.ctype.selected .radio{border-color:var(--accent)}
+.ctype.selected .radio::after{content:"";position:absolute;inset:3px;border-radius:99px;background:var(--accent)}
+.ctype h3{font-size:17px;font-weight:600}
+.ctype .price{font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);display:inline-block;padding:4px 11px;border-radius:99px;margin:8px 0;font-weight:600}
+.ctype p{font-size:13.5px;color:var(--ink-dim);line-height:1.5}
+
+/* Payment */
+.summary{background:var(--card);border-radius:28px;padding:10px 20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.srow{display:flex;justify-content:space-between;padding:11px 0;font-size:14.5px}
+.srow.total{border-top:1px dashed var(--line);margin-top:4px;padding-top:15px;font-weight:700;font-size:17px}
+.sectionlabel{font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;padding-left:6px;margin-bottom:10px}
+.paymethod{display:flex;align-items:center;gap:12px;border:2px solid transparent;border-radius:999px;padding:15px 20px;margin-bottom:10px;background:var(--card);cursor:pointer;box-shadow:var(--shadow)}
+.paymethod.selected{border-color:var(--accent)}
+.paymethod .radio{width:20px;height:20px;border-radius:99px;border:2px solid var(--line);position:relative;flex:none}
+.paymethod.selected .radio{border-color:var(--accent)}
+.paymethod.selected .radio::after{content:"";position:absolute;inset:3px;border-radius:99px;background:var(--accent)}
+
+/* Success */
+#screen-paysuccess{justify-content:center;align-items:center;text-align:center;gap:20px}
+.checkring{width:112px;height:112px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:var(--shadow)}
+
+/* App screens */
+.app-body{flex:1;overflow-y:auto;padding-bottom:18px}
+.app-top{display:flex;align-items:center;justify-content:space-between;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:12px}
+.app-top h2{font-size:26px;font-weight:700}
+
+/* Home hero */
+.hero{margin:calc(8px + env(safe-area-inset-top,0px)) 12px 0;border-radius:36px;padding:16px 18px 18px;color:#fff;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.hero .bellrow{width:100%;display:flex;align-items:center;justify-content:space-between}
+.hero .hi{font-size:14px;font-weight:500;opacity:.95;margin-top:4px}
+.hero .name{font-family:var(--font-display);font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:12px}
+.statuspill{width:100%;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:999px;padding:10px 12px 10px 10px;color:#fff;text-align:left;font-size:14px;font-weight:500}
+.statuspill .led{width:32px;height:32px;border-radius:99px;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;flex:none}
+.pulse{width:10px;height:10px;border-radius:99px;background:var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(62,158,104,.5)}70%{box-shadow:0 0 0 8px rgba(62,158,104,0)}100%{box-shadow:0 0 0 0 rgba(62,158,104,0)}}
+@media (prefers-reduced-motion: reduce){.pulse{animation:none}}
+.statuspill .txt{flex:1;min-width:0}
+.statuspill .chev{opacity:.9}
+
+.balcard{margin:-6px 12px 0;position:relative;background:var(--card);border-radius:30px;padding:20px 18px 16px 20px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;gap:2px}
+.balcard::after{content:"";position:absolute;right:-26px;top:-30px;width:130px;height:130px;border-radius:999px;background:radial-gradient(circle at 40% 40%,var(--accent-soft),transparent 70%);pointer-events:none}
+.balcard .ttl{font-family:var(--font-display);font-size:19px;font-weight:600;position:relative}
+.balcard .sub{font-size:13.5px;color:var(--ink-dim);display:flex;align-items:center;gap:7px;position:relative}
+.balcard .row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:22px;gap:12px;position:relative}
+.balance{font-family:var(--font-mono);font-size:25px;font-weight:500;letter-spacing:-.01em}
+.balance .cents{font-size:15px;color:var(--ink-dim)}
+
+.sectiontitle{font-family:var(--font-display);font-size:19px;font-weight:600;margin:26px 0 12px;display:flex;justify-content:space-between;align-items:baseline}
+.sectiontitle a{font-family:var(--font-body);font-size:13px;font-weight:600;color:var(--accent-ink);text-decoration:none}
+
+.chips{display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;grid-auto-columns:max-content;gap:10px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 18px 8px 8px;font-size:14px;font-weight:500;box-shadow:var(--shadow)}
+.chip .ci{width:30px;height:30px;border-radius:99px;background:var(--card-soft);display:flex;align-items:center;justify-content:center;color:var(--ink-dim)}
+
+.cardrail{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;margin-right:calc(-1 * max(20px,env(safe-area-inset-right,0px)))}
+.cardrail::-webkit-scrollbar{display:none}
+.news{flex:none;width:172px;height:210px;border-radius:30px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.news.dark{background:radial-gradient(70% 60% at 80% 15%,#E8602F 0%,transparent 70%),linear-gradient(160deg,#4A4642,#1B1918)}
+.news .tag{align-self:flex-start;background:rgba(255,255,255,.88);color:#3b2a20;font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:99px}
+.news .glassbox{background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:20px;padding:12px 13px;font-size:13.5px;font-weight:600;line-height:1.3}
+
+.metercard{height:176px;border-radius:32px;padding:18px 20px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.metercard .mid{align-self:flex-end;font-family:var(--font-mono);font-size:17px;font-weight:500;letter-spacing:.02em}
+.metercard .who{display:flex;align-items:center;gap:12px}
+.avatar{width:48px;height:48px;border-radius:99px;background:rgba(255,255,255,.3);border:2px solid rgba(255,255,255,.8);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:18px;flex:none}
+.metercard .nm{font-weight:600;font-size:14.5px}
+.metercard .pl{font-size:12.5px;opacity:.9}
+
+.softcard{background:var(--card-soft);border-radius:30px;padding:8px 18px}
+.txrow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.txrow:last-child{border-bottom:none}
+.txicon{width:38px;height:38px;border-radius:99px;background:var(--card);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink-dim)}
+.txicon.topup{color:var(--ok);background:var(--ok-soft)}
+.txicon.conn{color:var(--accent-ink);background:var(--accent-soft)}
+.txmeta{flex:1;min-width:0}
+.txmeta .t1{font-size:14px;font-weight:600}
+.txmeta .t2{font-size:12.5px;color:var(--ink-dim)}
+.txamt{font-family:var(--font-mono);font-size:14px;font-weight:500}
+.txamt.pos{color:var(--ok)}
+.txempty{padding:22px 0;text-align:center;color:var(--ink-dim);font-size:14px}
+
+/* Top-up */
+.amtgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.amtbtn{border:2px solid transparent;background:var(--card);border-radius:26px;padding:16px 18px;text-align:left;box-shadow:var(--shadow)}
+.amtbtn.selected{border-color:var(--accent)}
+.amtbtn .n{font-family:var(--font-mono);font-size:19px;font-weight:500}
+.amtbtn .k{font-size:12.5px;color:var(--ink-dim);margin-top:2px}
+.kwh-pill{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent-ink);border-radius:99px;padding:10px 16px;font-size:13.5px;font-weight:600;margin-bottom:12px}
+.balline{font-size:14px;color:var(--ink-dim);margin-bottom:14px}
+
+/* Activity */
+.seg{display:inline-flex;background:var(--card-soft);border-radius:999px;padding:4px;gap:2px;margin-bottom:16px}
+.seg button{border:none;background:transparent;border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--ink-dim)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px -3px rgba(0,0,0,.25)}
+.chartcard{background:var(--card);border-radius:30px;padding:18px;margin-bottom:6px;box-shadow:var(--shadow)}
+.chartcard h3{font-size:17px;font-weight:600}
+.chartcard .sub{font-size:13px;color:var(--ink-dim);margin:2px 0 12px}
+
+.themebtn .ico-moon{display:none}
+:root[data-theme="dark"] .themebtn .ico-sun{display:none}
+:root[data-theme="dark"] .themebtn .ico-moon{display:block}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .themebtn .ico-sun{display:none}:root:not([data-theme="light"]) .themebtn .ico-moon{display:block}}
+.seg{display:flex;background:var(--card-soft);border-radius:99px;padding:3px;gap:2px}
+.seg button{border:none;background:none;color:var(--ink-dim);font-family:inherit;font-weight:700;font-size:12.5px;padding:7px 12px;border-radius:99px}
+.seg button.on{background:var(--accent);color:#fff}
+body,.shell,.card,.balcard,.listcard,.panel{transition:background-color .3s ease,color .3s ease}
+button.txrow{width:100%;background:none;border:none;border-bottom:1px solid var(--line);text-align:left;font-family:inherit;color:inherit;cursor:pointer}
+button.txrow:last-child{border-bottom:none}
+button.txrow:active{background:var(--card-soft)}
+.txmodal{position:absolute;inset:0;z-index:70;display:flex;align-items:flex-end}
+.txmodal[hidden]{display:none}
+.txmodal .scrim{position:absolute;inset:0;background:rgba(10,8,7,.5);animation:dfade .2s ease}
+.txmodal .sheet{position:relative;width:100%;background:var(--bg);color:var(--ink);border-radius:32px 32px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom,0px));animation:sheetup .28s cubic-bezier(.2,.8,.2,1);max-height:88%;overflow-y:auto;box-shadow:0 -20px 50px -20px rgba(0,0,0,.5)}
+@keyframes sheetup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.txmodal .grab{width:40px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 14px}
+.txm-head{display:flex;align-items:center;gap:12px}
+.txm-head>div:nth-child(2){flex:1;min-width:0}
+.txm-title{font-weight:700;font-size:16px}
+.txm-sub{font-size:13px;color:var(--ink-dim);margin-top:2px}
+.txm-amt{font-family:var(--font-display);font-size:40px;font-weight:600;margin:18px 0 6px}
+.txm-amt.pos{color:var(--ok)}
+.txm-status{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;background:var(--ok-soft);color:var(--ok);padding:6px 12px;border-radius:99px}
+.txm-rows{background:var(--card);border-radius:24px;padding:4px 16px;margin:16px 0;box-shadow:var(--shadow)}
+.txm-row{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}
+.txm-row:last-child{border-bottom:none}
+.txm-row span:first-child{color:var(--ink-dim)}
+.txm-row span:last-child{font-weight:600;text-align:right}
+.txm-actions{display:flex;gap:10px}
+.avatar{overflow:hidden;padding:0;cursor:default;font-family:var(--font-display)}
+.avatar img,.avatar svg{width:100%;height:100%;display:block;object-fit:cover}
+button.avatar{cursor:pointer}
+.pcard .avatar.avatar-lg{width:72px;height:72px;font-size:28px;position:relative;overflow:visible;background:rgba(255,255,255,.3)}
+.pcard .avatar.avatar-lg>.av-in{width:100%;height:100%;border-radius:99px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pcard .avatar.avatar-lg::after{content:"";position:absolute;right:-2px;bottom:-2px;width:22px;height:22px;border-radius:99px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EF6A3A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M4 8h3l2-3h6l2 3h3v11H4z'/><circle cx='12' cy='13' r='3.5'/></svg>") center/14px no-repeat;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.pedit{border:none;border-radius:99px;background:rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;font-family:inherit}
+.avatar-xl{width:104px;height:104px;font-size:40px;border-width:3px;border-color:var(--accent);background:var(--card-soft);color:var(--ink)}
+.ep-prev{display:flex;justify-content:center;margin:14px 0 12px}
+.ep-photo{display:flex;gap:10px;justify-content:center;margin-bottom:14px}
+.ep-btn{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:99px;font-weight:700;font-size:13.5px;padding:10px 16px;font-family:inherit;cursor:pointer}
+.ep-btn.ghost{background:var(--card-soft);color:var(--ink)}
+.ep-label{font-size:12px;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.06em;padding-left:6px;margin-bottom:8px}
+.ep-chars{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px}
+.ep-chars button{border:3px solid transparent;border-radius:99px;padding:0;background:none;aspect-ratio:1;overflow:hidden}
+.ep-chars button.on{border-color:var(--accent)}
+.ep-chars svg{width:100%;height:100%;display:block}
+/* Notifications */
+.notifcard{background:var(--card);border-radius:30px;padding:6px 18px;box-shadow:var(--shadow)}
+.notif{display:flex;gap:12px;padding:15px 0;border-bottom:1px solid var(--line);position:relative}
+.notif:last-child{border-bottom:none}
+.notif.unread::after{content:"";position:absolute;right:0;top:19px;width:8px;height:8px;border-radius:99px;background:var(--accent)}
+.notif.unread .t1{font-weight:700}
+.nicon{width:40px;height:40px;border-radius:99px;display:flex;align-items:center;justify-content:center;flex:none}
+.nicon.warn{background:var(--warn-bg);color:var(--warn)}
+.nicon.ok{background:var(--ok-soft);color:var(--ok)}
+.notif .t1{font-size:14.5px;font-weight:600;padding-right:14px}
+.notif .t2{font-size:13.5px;color:var(--ink-dim);line-height:1.45;margin-top:2px}
+.notif .t3{font-size:12px;color:var(--ink-dim);margin-top:6px}
+
+
+.nbar{display:flex;align-items:center;gap:12px;margin:2px 4px 14px}
+.ncount{font-size:13.5px;font-weight:600;color:var(--ink-dim);flex:1}
+.nlink{background:none;border:none;color:var(--accent-ink);font-weight:700;font-size:13.5px;padding:8px 4px;font-family:inherit}
+.nlink:disabled{opacity:.4}
+.nadd{display:flex;align-items:center;gap:6px;border:none;border-radius:99px;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;padding:9px 14px;font-family:inherit}
+.nform{background:var(--card);border-radius:30px;padding:18px 18px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.nform[hidden]{display:none}
+.nempty{text-align:center;color:var(--ink-dim);font-size:14px;padding:40px 10px}
+.nempty[hidden]{display:none}
+.notif{cursor:pointer;align-items:flex-start}
+.notif .nbody{flex:1;min-width:0}
+.notif .t2.clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.ndel{flex:none;width:36px;height:36px;border-radius:99px;border:none;background:none;color:var(--ink-dim);display:flex;align-items:center;justify-content:center}
+.ndel:active{background:var(--card-soft)}
+.notif.unread::after{right:44px}
+.nicon.info{background:var(--card-soft);color:var(--ink-dim)}
+.bellbadge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#fff;color:var(--accent-ink);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.bellbadge[hidden]{display:none}
+
+/* Profile */
+.pcard{display:flex;align-items:center;gap:14px;border-radius:30px;padding:18px;margin-bottom:6px;color:#fff;box-shadow:var(--shadow)}
+.pcard .avatar{width:54px;height:54px}
+.pcard .pn{font-family:var(--font-display);font-weight:600;font-size:18px}
+.pcard .pp{font-size:13px;opacity:.92}
+.listcard{background:var(--card);border-radius:28px;padding:2px 18px;box-shadow:var(--shadow)}
+.rowlink{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border:none;border-bottom:1px solid var(--line);background:none;width:100%;text-align:left;font-size:15px}
+.rowlink:last-child{border-bottom:none}
+.rowlink .sub{font-size:13px;color:var(--ink-dim)}
+.rowlink.danger{color:var(--warn)}
+
+/* Bottom nav */
+.navbar{display:flex;background:var(--card);border-radius:30px 30px 0 0;padding-top:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px -18px rgba(60,35,20,.3)}
+.navitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--ink-dim);font-size:11.5px;font-weight:600;padding:2px}
+.navitem .ico{width:44px;height:36px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.navitem.active{color:var(--ink)}
+.navitem.active .ico{background:linear-gradient(180deg,var(--dark-1),var(--dark-2));color:#fff;box-shadow:0 6px 12px -6px rgba(0,0,0,.6)}
+
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:99px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:40;max-width:calc(100% - 40px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.spin{width:16px;height:16px;border-radius:99px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation-duration:1.6s}}
+
+/* ---- Feature additions ---- */
+[hidden]{display:none!important}
+.foot.tight{padding-bottom:12px}
+.panel{background:var(--card);border-radius:28px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.panel h3{font-size:17px;font-weight:600}
+.panel .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.tagchip{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--card-soft);color:var(--ink-dim);white-space:nowrap}
+.tagchip.ok{background:var(--ok-soft);color:var(--ok)}
+.tagchip.warn{background:var(--warn-bg);color:var(--warn)}
+.tagchip.acc{background:var(--accent-soft);color:var(--accent-ink)}
+
+.netbar{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:25;background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;display:flex;gap:8px;align-items:center;white-space:nowrap;box-shadow:var(--shadow)}
+.netbar .d{width:8px;height:8px;border-radius:99px;background:var(--warn)}
+
+.switch{position:relative;width:50px;height:30px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.switch .trk{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:background .2s}
+.switch .trk::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:99px;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:transform .2s}
+.switch input:checked + .trk{background:var(--accent)}
+.switch input:checked + .trk::after{transform:translateX(20px)}
+.switch input:focus-visible + .trk{outline:2px solid var(--accent);outline-offset:2px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+.setrow:last-child{border-bottom:none}
+.setrow .l1{font-size:15px;font-weight:600}
+.setrow .l2{font-size:13px;color:var(--ink-dim);line-height:1.4;margin-top:2px}
+
+.bar{height:10px;border-radius:99px;background:var(--card-soft);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--hero-3))}
+.stepper{display:inline-flex;align-items:center;gap:8px}
+.stepper button{width:30px;height:30px;border-radius:99px;border:1px solid var(--line);background:var(--card-soft);font-weight:700;font-size:16px;line-height:1}
+.stepper span{min-width:30px;text-align:center;font-family:var(--font-mono);font-size:14px}
+
+.ttlrow{display:flex;justify-content:space-between;align-items:center;position:relative}
+.speak{width:36px;height:36px;border-radius:99px;border:none;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.notebar{display:flex;align-items:center;gap:12px;border-radius:24px;padding:12px 14px;margin-top:14px;font-size:13.5px;line-height:1.4}
+.notebar.info{background:var(--card-soft)}
+.notebar.alert{background:var(--accent-soft);color:var(--accent-ink)}
+.notebar .grow{flex:1;min-width:0}
+.hc-rail{scroll-behavior:smooth;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-top:14px}
+.hc-rail::-webkit-scrollbar{display:none}
+.hc-card{flex:0 0 100%;scroll-snap-align:start;margin-top:0;box-sizing:border-box}
+.notebar.hc-card button.hc-x{background:transparent;color:inherit;padding:8px;opacity:.7;display:flex}
+.hc-dots{display:flex;justify-content:center;gap:6px;margin-top:8px}
+.hc-dots i{width:6px;height:6px;border-radius:99px;background:var(--line);transition:width .5s ease,background .5s ease}
+.hc-dots i.on{width:16px;background:var(--accent)}
+.notebar b{font-weight:700}
+.notebar button{border:none;border-radius:99px;padding:9px 14px;font-weight:700;font-size:13px;background:var(--ink);color:var(--bg);flex:none}
+
+.pick{display:flex;align-items:center;gap:12px;border:2px solid transparent;background:var(--card);border-radius:24px;padding:12px 14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow);width:100%;text-align:left}
+.pick.selected{border-color:var(--accent)}
+.pick .n{font-weight:600;font-size:14.5px}
+.pick .s{font-size:12.5px;color:var(--ink-dim)}
+.pick .grow{flex:1;min-width:0}
+.avs{width:40px;height:40px;border-radius:99px;background:var(--accent-soft);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;font-family:var(--font-display)}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.pill{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:10px 16px;font-size:14px;font-weight:600}
+.pill.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.pill[disabled]{opacity:.4}
+
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card-soft);border-radius:20px;padding:12px}
+.stat .v{font-family:var(--font-mono);font-size:17px;font-weight:500}
+.stat .k{font-size:11.5px;color:var(--ink-dim);margin-top:2px}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink-dim);margin-top:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.fc{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.fcd{background:var(--card-soft);border-radius:20px;padding:10px 4px;text-align:center}
+.fcd .dn{font-size:12px;color:var(--ink-dim);font-weight:600}
+.fcd .pc{font-family:var(--font-mono);font-size:13px;margin-top:4px}
+.fcd.low{background:var(--accent-soft);color:var(--accent-ink)}
+.fcd.low .dn{color:var(--accent-ink)}
+.fcd svg{margin:6px auto 0;display:block}
+.lb{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.lb:last-child{border-bottom:none}
+.lb .rk{width:26px;font-family:var(--font-mono);font-weight:500;color:var(--ink-dim)}
+.lb.me{background:var(--accent-soft);border-radius:18px;padding:12px;margin:2px -6px;border-bottom:none}
+.lb .n{flex:1;font-weight:600;font-size:14.5px;min-width:0}
+.lb .pts{font-family:var(--font-mono);font-size:14px}
+
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.badge{background:var(--card);border-radius:26px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-width:0}
+.badge .bi{width:48px;height:48px;border-radius:99px;display:flex;align-items:center;justify-content:center;background:var(--card-soft);color:var(--ink-dim)}
+.badge.earned .bi{color:#fff;background:linear-gradient(135deg,var(--hero-3),var(--hero-2))}
+.badge .bn{font-weight:700;font-size:15px;font-family:var(--font-display)}
+.badge .bd{font-size:12.5px;color:var(--ink-dim);line-height:1.4}
+.badge .bp{font-size:11.5px;color:var(--ink-dim);font-family:var(--font-mono)}
+
+.post{background:var(--card);border-radius:28px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px;position:relative;cursor:pointer}
+.post.unread::after{content:"";position:absolute;top:18px;right:18px;width:9px;height:9px;border-radius:99px;background:var(--accent)}
+.post .meta{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;font-size:12px;color:var(--ink-dim)}
+.post h3{font-size:16.5px;font-weight:600;margin-bottom:4px;padding-right:16px}
+.post p{font-size:14px;color:var(--ink-dim);line-height:1.5}
+.post .acts{display:flex;gap:8px;margin-top:12px}
+.post .acts button{border:1px solid var(--line);background:var(--card-soft);border-radius:99px;padding:9px 14px;font-weight:600;font-size:13px}
+.post .acts button.on{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+
+.ajohead{border-radius:30px;padding:20px;color:#fff;margin-bottom:14px;box-shadow:var(--shadow)}
+.ajohead .gn{font-family:var(--font-display);font-size:20px;font-weight:600}
+.ajohead .gs{font-size:13px;opacity:.95;margin-top:2px}
+.ajohead .pot{font-family:var(--font-mono);font-size:27px;font-weight:500;margin:16px 0 10px}
+.ajohead .pot small{font-size:14px;opacity:.9}
+.ajohead .bar{background:rgba(255,255,255,.32)}
+.ajohead .bar>i{background:#fff}
+.ajohead .gr{font-size:13.5px;margin-top:12px;line-height:1.4}
+.mem{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.mem:last-child{border-bottom:none}
+.mem .n{flex:1;font-weight:600;font-size:14.5px;min-width:0}
+.linkbtn{background:none;border:none;color:var(--accent-ink);font-weight:700;font-size:13.5px;padding:8px 0;text-decoration:underline}
+
+.ap{border-bottom:1px solid var(--line);padding:13px 0}
+.ap:last-child{border-bottom:none}
+.ap .r{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ap .n{font-weight:600;font-size:14.5px}
+.ap .s{font-size:12.5px;color:var(--ink-dim)}
+.ap .ctl{display:flex;gap:18px;align-items:center;padding-top:10px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-dim)}
+.ap .ctl > div{display:flex;align-items:center;gap:8px}
+.result{position:sticky;top:0;z-index:4;background:var(--bg);padding-bottom:10px}
+.result .panel{margin-bottom:0}
+.gauge{height:12px;border-radius:99px;background:var(--card-soft);position:relative;overflow:hidden;margin:10px 0 8px}
+.gauge i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:var(--ok);min-width:6px}
+.gauge.over i{background:var(--warn)}
+.big{font-family:var(--font-mono);font-size:22px;font-weight:500}
+.res2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.res2 .k{font-size:12px;color:var(--ink-dim)}
+
+.code{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.code:last-child{border-bottom:none}
+.code b{font-family:var(--font-mono);font-weight:500;background:var(--card-soft);border-radius:10px;padding:4px 10px;white-space:nowrap;font-size:13px}
+.ussd{position:absolute;inset:0;background:rgba(10,8,7,.6);z-index:50;display:flex;align-items:center;justify-content:center;padding:24px}
+.ussd .dlg{width:100%;max-width:340px;background:#1B1A19;color:#F3EFEC;border-radius:28px;padding:20px;box-shadow:0 30px 60px -20px rgba(0,0,0,.7);font-family:var(--font-mono)}
+.ussd .scr{white-space:pre-wrap;font-size:13.5px;line-height:1.55;min-height:110px;margin-bottom:12px}
+.ussd input{width:100%;background:#2A2826;border:1px solid #3A3735;border-radius:14px;color:#fff;padding:12px;font-family:var(--font-mono);font-size:15px;margin-bottom:12px}
+.ussd .row{display:flex;gap:10px}
+.ussd button{flex:1;border:none;border-radius:14px;padding:13px;font-weight:700;font-size:14px;font-family:var(--font-body)}
+.ussd .bc{background:#3A3735;color:#fff}
+.ussd .bs{background:#EF6A3A;color:#fff}
+
+.rolesel{font-family:inherit;font-size:13px;padding:8px 10px;border-radius:14px;border:1px solid var(--line);background:var(--card-soft);color:var(--ink)}
+.xbtn{width:32px;height:32px;border-radius:99px;border:none;background:var(--card-soft);color:var(--ink-dim);font-size:16px;flex:none}
+.ptable{width:100%;border-collapse:collapse;font-size:12.5px}
+.ptable th,.ptable td{padding:8px 4px;text-align:center;border-bottom:1px solid var(--line)}
+.ptable th:first-child,.ptable td:first-child{text-align:left}
+.ptable tr:last-child td{border-bottom:none}
+
+.show-lowdata{display:none}
+.lowdata .hide-lowdata{display:none!important}
+.lowdata .show-lowdata{display:block}
+.txicon.gift{color:var(--accent-ink);background:var(--accent-soft)}
+.txicon.ajo,.txicon.auto{color:var(--ok);background:var(--ok-soft)}
+.seg button{padding:9px 13px}
+.drawer{position:absolute;inset:0;z-index:60;display:flex}
+.drawer[hidden]{display:none}
+.drawer .scrim{position:absolute;inset:0;background:rgba(10,8,7,.5);animation:dfade .2s ease}
+.drawer .panel{position:relative;width:80%;max-width:320px;height:100%;background:var(--bg);color:var(--ink);padding:calc(22px + env(safe-area-inset-top,0px)) 16px 20px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;box-shadow:24px 0 50px -20px rgba(0,0,0,.5);animation:dslide .24s ease}
+.drawer .dhead{display:flex;align-items:center;gap:12px;padding:4px 4px 16px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.drawer .dnm{font-family:var(--font-display);font-weight:700;font-size:18px;line-height:1.2}
+.drawer .dpl{font-size:13px;color:var(--ink-dim)}
+.drawer .dgrp{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);padding:14px 8px 6px}
+.drawer .ditem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;color:var(--ink);font:inherit;font-size:16px;font-weight:500;padding:12px 10px;border-radius:14px;cursor:pointer}
+.drawer .ditem:hover,.drawer .ditem:focus-visible{background:var(--card-soft);outline:none}
+.drawer .ditem svg{flex:none;color:var(--ink-dim)}
+.drawer .dclose{margin-left:auto;flex:none}
+@keyframes dslide{from{transform:translateX(-24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes dfade{from{opacity:0}to{opacity:1}}
+</style>
+
+<div class="shell" id="shell">
+  <div class="netbar" id="netbar" hidden><span class="d"></span><span id="netbarText">Offline</span></div>
+  <div class="txmodal" id="editModal" hidden>
+    <div class="scrim" onclick="closeEditProfile()"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="epTitle">
+      <div class="grab"></div>
+      <div class="txm-head"><div class="txm-title" id="epTitle" style="flex:1;font-size:19px">Edit profile</div><button class="iconbtn txm-x" onclick="closeEditProfile()" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="ep-prev"><div class="avatar avatar-xl" id="epPreview"></div></div>
+      <div class="ep-photo">
+        <label class="ep-btn"><input type="file" accept="image/*" id="epFile" onchange="pickPhoto(this)" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Upload photo</label>
+        <button class="ep-btn ghost" onclick="useInitial()">Use initial</button>
+      </div>
+      <div class="ep-label">Or pick a sunny character</div>
+      <div class="ep-chars" id="epChars"></div>
+      <div class="field"><label for="epName">Full name</label><input id="epName" type="text" maxlength="40"></div>
+      <div class="field"><label for="epPhone">Phone number</label><input id="epPhone" type="tel" maxlength="20"></div>
+      <div class="field"><label for="epStreet">Street or landmark</label><input id="epStreet" type="text" maxlength="60"></div>
+      <div class="txm-actions"><button class="btn" style="background:var(--card-soft);color:var(--ink)" onclick="closeEditProfile()">Cancel</button><button class="btn btn-dark" onclick="saveEditProfile()">Save changes</button></div>
+    </div>
+  </div>
+  <div class="txmodal" id="txModal" hidden>
+    <div class="scrim" onclick="closeTx()"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="txmTitle">
+      <div class="grab"></div>
+      <div class="txm-head"><div class="txicon" id="txmIcon"></div><div><div class="txm-title" id="txmTitle"></div><div class="txm-sub" id="txmSub"></div></div><button class="iconbtn txm-x" onclick="closeTx()" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="txm-amt tnum" id="txmAmt"></div>
+      <div class="txm-status" id="txmStatus"></div>
+      <div class="txm-rows" id="txmRows"></div>
+      <div class="txm-actions" id="txmActions"></div>
+    </div>
+  </div>
+  <div class="drawer" id="drawer" hidden>
+    <div class="scrim" onclick="closeMenu()"></div>
+    <div class="panel" role="dialog" aria-modal="true" aria-label="Menu">
+      <div class="dhead">
+        
+        <div><div class="dnm" id="drawerName">Lobar Lorenzo</div><div class="dpl" id="drawerPlan">Hybrid (Backup)</div></div>
+        <button class="iconbtn dclose" onclick="closeMenu()" aria-label="Close menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <button class="ditem" onclick="menuGo('screen-home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4Z"/></svg><span>Home</span></button><button class="ditem" onclick="menuGo('screen-topup')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span>Top up</span></button><button class="ditem" onclick="menuGo('screen-activity')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9M10 18V5M16 18v-7M21 18H3"/></svg><span>Activity</span></button><button class="ditem" onclick="menuGo('screen-community')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19c.6-3 2.7-4.6 5.5-4.6s4.9 1.6 5.5 4.6M15 15c2.6-.3 4.6.9 5.5 4"/></svg><span>Community</span></button><button class="ditem" onclick="menuGo('screen-profile')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.5 20c.9-3.6 3.9-5.6 7.5-5.6s6.6 2 7.5 5.6"/></svg><span>Profile</span></button>
+      <div class="dgrp">More</div>
+      <button class="ditem" onclick="menuGo('screen-gift')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7Z"/></svg><span>Send credit</span></button><button class="ditem" onclick="menuGo('screen-ajo')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.5c0-1 1-1.6 2.5-1.6s2.5.6 2.5 1.6-1 1.4-2.5 1.6-2.5.6-2.5 1.6 1 1.6 2.5 1.6 2.5-.6 2.5-1.6"/></svg><span>Ajo savings</span></button><button class="ditem" onclick="menuGo('screen-auto')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg><span>Auto top-up</span></button><button class="ditem" onclick="menuGo('screen-appliances')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg><span>Appliance estimator</span></button>
+      <div class="dgrp">Settings</div>
+      <button class="ditem" onclick="menuGo('screen-language')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span>Language and voice</span></button><button class="ditem" onclick="menuGo('screen-household')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4Z"/><path d="M10 20v-5h4v5"/></svg><span>Household members</span></button><button class="ditem" onclick="menuGo('screen-offline')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>Alerts and offline</span></button>
+    </div>
+  </div>
+  <div class="ussd" id="ussd" hidden>
+    <div class="dlg" role="dialog" aria-label="USSD session">
+      <div class="scr" id="ussdScr"></div>
+      <input id="ussdIn" type="text" autocomplete="off" aria-label="USSD reply" onkeydown="if(event.key==='Enter')ussdSend()">
+      <div class="row"><button class="bc" onclick="closeUssd()">Cancel</button><button class="bs" id="ussdSend" onclick="ussdSend()">Send</button></div>
+    </div>
+  </div>
+
+
+  <!-- SPLASH -->
+  <section class="screen active warm" id="screen-splash">
+    <div class="mark pad">
+      <svg class="sunmark" viewBox="0 0 84 84" fill="none"><circle cx="42" cy="42" r="18" fill="#fff"/><g stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M42 6v10"/><path d="M42 68v10"/><path d="M6 42h10"/><path d="M68 42h10"/><path d="M15.5 15.5l7 7"/><path d="M61.5 61.5l7 7"/><path d="M68.5 15.5l-7 7"/><path d="M22.5 61.5l-7 7"/></g></svg>
+      <h1>Lorenzo</h1>
+      <p class="tag">Solar power for Ogombo. Pay only for what you use.</p>
+    </div>
+    <div class="foot pad">
+      <button class="btn btn-dark" onclick="go('screen-onboard')">Get started</button>
+      <button class="btn btn-glass" onclick="toast('Demo only: sign-in is not wired up')">I already have an account</button>
+    </div>
+  </section>
+
+  <!-- ONBOARDING -->
+  <section class="screen" id="screen-onboard">
+    <div class="ob-slides pad" id="obSlides">
+      <div class="ob-slide">
+        <div class="ob-art warm"><div class="ring"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div></div>
+        <h2>Reliable power, no diesel</h2>
+        <p>One solar mini-grid supplies your street, so the fridge keeps running when the lights go out.</p>
+      </div>
+      <div class="ob-slide">
+        <div class="ob-art warm"><div class="ring"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M8 21h8M12 17v4"/></svg></div></div>
+        <h2>Connect in minutes</h2>
+        <p>Sign up, choose Hybrid or Primary, and pay a one-time connection fee. A technician links your meter.</p>
+      </div>
+      <div class="ob-slide">
+        <div class="ob-art warm"><div class="ring"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></div></div>
+        <h2>Pay only for what you use</h2>
+        <p>Top up any time, watch your kWh and naira balance live, and get a nudge before you run low.</p>
+      </div>
+    </div>
+    <div class="dots" id="obDots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+    <div class="foot pad"><button class="btn btn-dark" id="obNext" onclick="obNext()">Next</button></div>
+  </section>
+
+  <!-- SIGN UP -->
+  <section class="screen" id="screen-signup">
+    <div class="topbar pad"><button class="iconbtn" onclick="go('screen-onboard')" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Create your account</h2></div>
+    <div class="stack-body pad">
+      <div class="field"><label for="inpName">Full name</label><input id="inpName" type="text" placeholder="e.g. Lobar Lorenzo" value="Lobar Lorenzo"></div>
+      <div class="field"><label for="inpPhone">Phone number</label><input id="inpPhone" type="tel" placeholder="080X XXX XXXX" value="0803 214 7765"></div>
+      <div class="field"><label for="inpType">Property type</label>
+        <select id="inpType"><option>Household</option><option>Small business / shop</option><option>School</option><option>Pharmacy</option><option>Place of worship</option><option>Kiosk</option></select>
+      </div>
+      <div class="field"><label for="inpStreet">Street or landmark in Ogombo</label><input id="inpStreet" type="text" placeholder="e.g. 14 Adewale Street, off Abijo GRA" value="14 Adewale Street, off Abijo GRA"></div>
+      <p class="hint" style="padding-left:6px">A site surveyor confirms you are within mini-grid range before installation.</p>
+    </div>
+    <div class="foot pad"><button class="btn btn-dark" onclick="go('screen-connection')">Continue</button></div>
+  </section>
+
+  <!-- CONNECTION TYPE -->
+  <section class="screen" id="screen-connection">
+    <div class="topbar pad"><button class="iconbtn" onclick="go('screen-signup')" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Choose connection</h2></div>
+    <div class="stack-body pad">
+      <p class="hint" style="margin-bottom:14px;padding-left:6px">You can switch connection type later from your profile.</p>
+      <div class="ctype selected" id="ctHybrid" tabindex="0" onclick="selectConn('hybrid')">
+        <div class="radio"></div>
+        <div><h3>Hybrid (Backup)</h3><span class="price">₦15,000 one-time</span>
+          <p>Keep your distribution company supply. Lorenzo takes over automatically during outages.</p></div>
+      </div>
+      <div class="ctype" id="ctPrimary" tabindex="0" onclick="selectConn('primary')">
+        <div class="radio"></div>
+        <div><h3>Primary (Full)</h3><span class="price">₦25,000 one-time</span>
+          <p>Replace your existing supply entirely. All your electricity comes from the solar hub.</p></div>
+      </div>
+    </div>
+    <div class="foot pad"><button class="btn btn-dark" onclick="go('screen-payment')">Continue to payment</button></div>
+  </section>
+
+  <!-- PAYMENT -->
+  <section class="screen" id="screen-payment">
+    <div class="topbar pad"><button class="iconbtn" onclick="go('screen-connection')" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Connection payment</h2></div>
+    <div class="stack-body pad">
+      <div class="summary">
+        <div class="srow"><span id="payPlanLabel">Hybrid (Backup) connection</span><span class="tnum" id="payPlanAmt">₦15,000</span></div>
+        <div class="srow"><span>Smart prepaid meter</span><span class="tnum">Included</span></div>
+        <div class="srow total"><span>Total due today</span><span class="tnum" id="payTotal">₦15,000</span></div>
+      </div>
+      <p class="sectionlabel">Payment method</p>
+      <div class="paymethod selected" onclick="selectPay(this)"><div class="radio"></div><span>Debit or credit card</span></div>
+      <div class="paymethod" onclick="selectPay(this)"><div class="radio"></div><span>Bank transfer</span></div>
+      <div class="paymethod" onclick="selectPay(this)"><div class="radio"></div><span>USSD</span></div>
+      <p class="hint" style="padding-left:6px;margin-top:6px">Prototype: no real payment is taken.</p>
+    </div>
+    <div class="foot pad"><button class="btn btn-dark" id="payBtn" onclick="pay()"><span id="payBtnLabel">Pay ₦15,000</span></button></div>
+  </section>
+
+  <!-- PAY SUCCESS -->
+  <section class="screen" id="screen-paysuccess">
+    <div class="checkring warm"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg></div>
+    <div class="pad"><h2 style="font-size:26px;margin-bottom:8px;font-weight:700">Connection confirmed</h2><p style="color:var(--ink-dim);font-size:15px;max-width:280px;margin:0 auto;line-height:1.5">A technician will install your meter within 3 to 5 working days.</p></div>
+    <div class="pad" style="width:100%;margin-top:6px"><button class="btn btn-dark" onclick="enterApp()">Go to dashboard</button></div>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="screen-home">
+    <div class="app-body">
+      <div class="hero warm">
+        <div class="bellrow"><button class="iconbtn on-warm" onclick="openMenu()" aria-label="Open menu" aria-haspopup="dialog"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button><div style="display:flex;gap:10px"><button class="iconbtn on-warm themebtn" onclick="toggleTheme()" aria-label="Switch light or dark mode"><svg class="ico-sun" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="ico-moon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button><button class="iconbtn on-warm" onclick="go('screen-notif')" aria-label="Notifications"><span class="bellbadge" id="bellBadge" hidden></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 10a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" stroke-linecap="round"/></svg></button></div></div>
+        
+        <div class="hi" data-i18n="welcome">Welcome back</div>
+        <div class="name" id="homeName">Lobar Lorenzo</div>
+        <button class="statuspill" onclick="go('screen-activity')">
+          <span class="led"><span class="pulse"></span></span>
+          <span class="txt">Grid online: solar and battery</span>
+          <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+
+      <div class="balcard">
+        <div class="ttlrow"><div class="ttl" data-i18n="balTitle">Energy balance</div><button class="speak" onclick="speakBalance()" aria-label="Read balance aloud"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button></div>
+        <div class="sub"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span class="balance-sub">About 6.9 kWh left, lasts ~3 days</span></div>
+        <div class="row">
+          <div class="balance tnum">₦1,240<span class="cents">.00</span></div>
+          <button class="btn btn-dark btn-sm" onclick="go('screen-topup')">Top up</button>
+        </div>
+      </div>
+
+      <div class="pad">
+        <div id="viewAsBar"></div>
+        <div id="wxAlert"></div>
+        <div class="sectiontitle"><span data-i18n="services">Services</span></div>
+        <div class="chips" id="chips"></div>
+
+        <div class="hide-lowdata">
+        <div class="sectiontitle"><span data-i18n="hubUpdates">Hub updates</span></div>
+        <div class="cardrail">
+          <div class="news warm" onclick="openCommunity('notices')"><span class="tag">Hub</span><div class="glassbox">40 kWp of solar now powers your street</div></div>
+          <div class="news dark" onclick="openCommunity('hub')"><span class="tag">Tip</span><div class="glassbox">Run heavy loads at midday to stretch your credit</div></div>
+          <div class="news warm" onclick="openCommunity('notices')"><span class="tag">Hub</span><div class="glassbox">150 kWh battery keeps lights on overnight</div></div>
+        </div>
+        </div>
+
+        <div class="sectiontitle"><span data-i18n="meterCard">Meter card</span></div>
+        <div class="metercard warm">
+          <div class="mid">LRZ-OG-0142</div>
+          <div class="who"><div class="avatar" id="mcInit">L</div><div><div class="nm" id="mcName">Lobar Lorenzo</div><div class="pl" id="mcPlan">Hybrid (Backup)</div></div></div>
+        </div>
+
+        <div class="sectiontitle"><span data-i18n="recent">Recent activity</span><a href="#" data-i18n="seeAll" onclick="go('screen-activity');return false">See all</a></div>
+        <div class="softcard" id="homeTx"></div>
+      </div>
+    </div>
+    <nav class="navbar" id="navbar"></nav>
+  </section>
+
+  <!-- TOP-UP -->
+  <section class="screen" id="screen-topup">
+    <div class="app-body">
+      <div class="topbar pad"><button class="iconbtn" onclick="go('screen-home')" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2 data-i18n="titleTopup">Top up</h2></div>
+      <div class="pad">
+        <p class="balline"><span data-i18n="curBal">Current balance</span> <strong class="tnum" style="color:var(--ink)" id="topupBal">₦1,240</strong></p>
+        <div class="amtgrid" id="amtGrid"></div>
+        <div class="field"><label for="customAmt" data-i18n="orEnter">Or enter an amount</label><input id="customAmt" type="number" inputmode="numeric" placeholder="₦ amount" oninput="customAmt(this.value)"></div>
+        <div class="kwh-pill" id="kwhPill">= 11.1 kWh at ₦180/kWh</div>
+      </div>
+    </div>
+    <div class="foot pad tight"><button class="btn btn-dark" id="topupBtn" onclick="doTopup()"><span id="topupBtnLabel">Top up ₦2,000</span></button></div>
+    <nav class="navbar"></nav>
+  </section>
+
+  <!-- ACTIVITY -->
+  <section class="screen" id="screen-activity">
+    <div class="app-body">
+      <div class="app-top pad"><h2 data-i18n="titleActivity">Activity</h2></div>
+      <div class="pad">
+        <div class="chartcard hide-lowdata">
+          <h3>Last 7 days</h3>
+          <div class="sub" id="chartSub">Sample data</div>
+          <svg viewBox="0 0 300 130" width="100%" height="130" role="img" aria-label="Bar chart of daily electricity use over the last seven days">
+            <defs><linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent-soft)"/></linearGradient></defs>
+            <line x1="8" y1="96" x2="292" y2="96" style="stroke:var(--line)" stroke-width="1"/>
+            <g id="barChart"></g>
+          </svg>
+        </div>
+        <div class="panel show-lowdata"><div class="ph"><h3>Last 7 days</h3><span class="tagchip">Low-data view</span></div><div id="usageTable"></div></div>
+        <div class="sectiontitle" style="margin-top:22px">Transactions</div>
+        <div class="seg" id="seg">
+          <button class="on" data-f="all" onclick="setFilter('all')">All</button>
+          <button data-f="topup" onclick="setFilter('topup')">Top-ups</button>
+          <button data-f="usage" onclick="setFilter('usage')">Usage</button>
+          <button data-f="shared" onclick="setFilter('shared')">Shared</button>
+        </div>
+        <div class="softcard" id="activityTx"></div>
+      </div>
+    </div>
+    <nav class="navbar" id="navbar2"></nav>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="screen-profile">
+    <div class="app-body">
+      <div class="app-top pad"><h2 data-i18n="titleProfile">Profile</h2></div>
+      <div class="pad">
+        <div class="pcard warm">
+          <button class="avatar avatar-lg" id="avatarInit" onclick="openEditProfile()" aria-label="Change profile photo">L</button>
+          <div style="flex:1;min-width:0"><div class="pn" id="profName">Lobar Lorenzo</div><div class="pp" id="profPhone">0803 214 7765</div></div>
+          <button class="pedit" onclick="openEditProfile()">Edit</button>
+        </div>
+        <div class="sectiontitle">Connection</div>
+        <div class="listcard">
+          <button class="rowlink" onclick="toast('Switching connection type needs a site visit')"><span>Plan</span><span class="sub" id="profPlan">Hybrid (Backup)</span></button>
+          <button class="rowlink" onclick="toast('Meter ID copied')"><span>Meter ID</span><span class="sub tnum">LRZ-OG-0142</span></button>
+          <button class="rowlink" onclick="toast('Demo only')"><span>Street address</span><span class="sub" id="profStreet">14 Adewale Street</span></button>
+        </div>
+        <div class="sectiontitle">Appearance</div>
+        <div class="listcard"><div class="rowlink" style="cursor:default"><span>Theme</span><div class="seg" id="themeSeg" role="group" aria-label="Theme"><button data-m="light" onclick="setTheme('light')">Light</button><button data-m="dark" onclick="setTheme('dark')">Dark</button><button data-m="system" onclick="setTheme('system')">Auto</button></div></div></div>
+        <div class="sectiontitle">Settings</div>
+        <div class="listcard">
+          <button class="rowlink" onclick="go('screen-language')"><span>Language and voice</span><span class="sub">→</span></button>
+          <button class="rowlink" onclick="go('screen-household')"><span>Household members</span><span class="sub">→</span></button>
+          <button class="rowlink" onclick="go('screen-auto')"><span>Auto top-up</span><span class="sub">→</span></button>
+          <button class="rowlink" onclick="go('screen-offline')"><span>Alerts and offline</span><span class="sub">→</span></button>
+        </div>
+        <div class="sectiontitle">Support</div>
+        <div class="listcard">
+          <button class="rowlink" onclick="toast('Demo only: would open chat support')"><span>Contact support</span><span class="sub">→</span></button>
+          <button class="rowlink" onclick="toast('Demo only: would report an outage')"><span>Report an outage</span><span class="sub">→</span></button>
+          <button class="rowlink danger" onclick="resetApp()"><span>Log out</span><span>→</span></button>
+        </div>
+      </div>
+    </div>
+    <nav class="navbar" id="navbar3"></nav>
+  </section>
+
+  <!-- NOTIFICATIONS -->
+  <section class="screen" id="screen-notif">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2 data-i18n="titleNotif">Notifications</h2></div>
+    <div class="stack-body pad">
+      <div class="nbar">
+        <span class="ncount" id="nCount"></span>
+        <button class="nlink" id="nMarkAll" onclick="markAllNotifs()">Mark all as read</button>
+        <button class="nadd" onclick="toggleNotifForm()" aria-label="Add notification"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+      </div>
+      <div class="nform" id="nForm" hidden>
+        <div class="field"><label for="nfType">Type</label><select id="nfType"><option value="info">Reminder</option><option value="warn">Alert</option><option value="ok">Good news</option></select></div>
+        <div class="field"><label for="nfTitle">Title</label><input id="nfTitle" maxlength="60" placeholder="e.g. Pay estate levy"></div>
+        <div class="field"><label for="nfBody">Message</label><input id="nfBody" maxlength="140" placeholder="Short details"></div>
+        <div style="display:flex;gap:10px"><button class="btn" style="background:var(--card-soft);color:var(--ink)" onclick="toggleNotifForm()">Cancel</button><button class="btn" style="background:var(--accent);color:#fff" onclick="addNotif()">Save</button></div>
+      </div>
+      <div class="notifcard" id="notifList"></div>
+      <div class="nempty" id="nEmpty" hidden>You are all caught up. No notifications.</div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY (tab) -->
+  <section class="screen" id="screen-community">
+    <div class="app-body">
+      <div class="app-top pad"><h2 data-i18n="titleCommunity">Community</h2></div>
+      <div class="pad">
+        <div class="seg" id="commSeg">
+          <button class="on" data-t="hub" onclick="commTab('hub')">Hub</button>
+          <button data-t="badges" onclick="commTab('badges')">Badges</button>
+          <button data-t="notices" onclick="commTab('notices')">Notices<span id="noticeCount"></span></button>
+        </div>
+
+        <div id="comm-hub">
+          <div class="panel">
+            <div class="ph"><h3>Hub right now</h3><span class="tagchip">Sample data</span></div>
+            <div class="stats3" id="hubStats"></div>
+            <div class="hide-lowdata">
+              <svg id="hubChart" viewBox="0 0 300 140" width="100%" height="140" role="img" aria-label="Solar generation compared with community use across the day"></svg>
+              <div class="legend"><span><i style="background:var(--accent)"></i>Solar generation</span><span><i style="background:var(--ink)"></i>Community use</span></div>
+            </div>
+            <p class="hint" style="margin-top:10px">Midday has the most solar. Run heavy loads then to save credit and keep the battery for the evening.</p>
+          </div>
+          <div class="panel" id="forecastPanel"></div>
+          <div class="panel">
+            <div class="ph"><h3>Adewale Street this week</h3><span class="tagchip">Sample data</span></div>
+            <div id="leaderboard"></div>
+            <p class="hint" style="margin-top:8px">Score is the share of your power used between 10 AM and 4 PM. Other homes show by house number only.</p>
+          </div>
+        </div>
+
+        <div id="comm-badges" hidden></div>
+        <div id="comm-notices" hidden></div>
+      </div>
+    </div>
+    <nav class="navbar"></nav>
+  </section>
+
+  <!-- SEND CREDIT -->
+  <section class="screen" id="screen-gift">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Send credit</h2></div>
+    <div class="stack-body pad">
+      <div class="panel" style="padding:16px 18px">
+        <div class="hint">You can send up to</div>
+        <div class="tnum" style="font-size:26px;font-weight:500;margin:2px 0" id="giftAvail">0 kWh</div>
+        <div class="hint" id="giftNote"></div>
+      </div>
+      <p class="sectionlabel">Send to</p>
+      <div id="giftRecipients"></div>
+      <div class="field"><label for="giftMeter">Or enter a meter ID</label><input id="giftMeter" type="text" placeholder="e.g. LRZ-OG-0125" oninput="giftMeterInput(this.value)"></div>
+      <p class="sectionlabel">Amount</p>
+      <div class="pills" id="giftPills"></div>
+      <div class="kwh-pill" id="giftSummary"></div>
+      <div class="field"><label for="giftMsg">Message (optional)</label><input id="giftMsg" type="text" maxlength="60" placeholder="e.g. Light for the week"></div>
+    </div>
+    <div class="foot pad"><button class="btn btn-dark" id="giftBtn" onclick="doGift()"><span id="giftBtnLabel">Send credit</span></button></div>
+  </section>
+
+  <!-- AJO -->
+  <section class="screen" id="screen-ajo">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Ajo savings</h2></div>
+    <div class="stack-body pad" id="ajoBody"></div>
+    <div class="foot pad"><button class="btn btn-dark" id="ajoBtn" onclick="contributeAjo()"><span id="ajoBtnLabel">Contribute ₦1,000</span></button></div>
+  </section>
+
+  <!-- AUTO TOP-UP -->
+  <section class="screen" id="screen-auto">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Auto top-up</h2></div>
+    <div class="stack-body pad">
+      <div class="listcard" style="margin-bottom:14px">
+        <div class="setrow">
+          <div><div class="l1">Top up automatically</div><div class="l2" id="autoSummary"></div></div>
+          <label class="switch"><input type="checkbox" id="autoOn" onchange="setAuto('on', this.checked)" aria-label="Top up automatically"><span class="trk"></span></label>
+        </div>
+      </div>
+      <div class="field"><label for="autoThreshold">When balance drops below</label>
+        <select id="autoThreshold" onchange="setAuto('threshold', this.value)"><option value="3">3 kWh</option><option value="5">5 kWh</option><option value="8">8 kWh</option></select></div>
+      <div class="field"><label for="autoAmount">Add this amount</label>
+        <select id="autoAmount" onchange="setAuto('amount', this.value)"><option value="500">₦500</option><option value="1000">₦1,000</option><option value="2000">₦2,000</option></select></div>
+      <div class="field"><label for="autoSource">Pay from</label>
+        <select id="autoSource" onchange="setAuto('source', this.value)"><option value="wallet">Mobile money wallet</option><option value="bank">Bank account</option></select></div>
+      <div class="field"><label for="autoCap">Monthly limit</label>
+        <select id="autoCap" onchange="setAuto('cap', this.value)"><option value="2000">₦2,000</option><option value="5000">₦5,000</option><option value="10000">₦10,000</option></select>
+        <p class="hint" id="autoSpent"></p></div>
+      <button class="btn btn-dark" onclick="tryAuto()">Try it: drop my balance to 4.5 kWh</button>
+      <p class="hint" style="margin-top:10px;padding-left:6px">Prototype: no real wallet or bank is linked. Auto top-ups show in your activity with an Auto label.</p>
+    </div>
+  </section>
+
+  <!-- OFFLINE, USSD, ALERTS -->
+  <section class="screen" id="screen-offline">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Alerts and offline</h2></div>
+    <div class="stack-body pad">
+      <div class="panel">
+        <div class="ph"><h3>Quick support alert</h3><span class="tagchip" id="alertQueue"></span></div>
+        <div class="field" style="margin-bottom:12px"><label for="alertIssue">What is wrong?</label>
+          <select id="alertIssue"><option>No power at my meter</option><option>Voltage is low or flickering</option><option>Meter display is blank</option><option>Smell of burning or sparks</option><option>Something else</option></select></div>
+        <button class="btn btn-dark" onclick="sendAlert()">Send alert</button>
+        <p class="hint" style="margin-top:10px">With no data, the alert is saved and goes out as an SMS when you have signal.</p>
+      </div>
+
+      <div class="listcard" style="margin-bottom:14px">
+        <div class="setrow">
+          <div><div class="l1">Low-data mode</div><div class="l2">Hides charts and news cards. Balance, top-up and notices still work.</div></div>
+          <label class="switch"><input type="checkbox" id="lowDataSw" onchange="setLowData(this.checked)" aria-label="Low-data mode"><span class="trk"></span></label>
+        </div>
+        <div class="setrow">
+          <div><div class="l1">Pretend I am offline</div><div class="l2">Demo switch. Shows saved data and the USSD fallback.</div></div>
+          <label class="switch"><input type="checkbox" id="offlineSw" onchange="setOffline(this.checked)" aria-label="Pretend I am offline"><span class="trk"></span></label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><h3>No data? Use a code</h3></div>
+        <div class="code"><span>Main menu</span><b>*347#</b></div>
+        <div class="code"><span>Check balance</span><b>*347*1#</b></div>
+        <div class="code"><span>Top up ₦1,000</span><b>*347*2*1000#</b></div>
+        <div class="code"><span>Last tokens</span><b>*347*3#</b></div>
+        <div class="code"><span>Report a fault</span><b>*347*4#</b></div>
+        <p class="hint" style="margin:10px 0 12px">SMS also works: text BAL, TOPUP 1000 or FAULT to the Lorenzo number. These are example codes. The real ones are issued with the telecom partner at launch.</p>
+        <button class="btn btn-glass" style="border-color:var(--line)" onclick="openUssd()">Try the USSD menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LANGUAGE AND VOICE -->
+  <section class="screen" id="screen-language">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Language and voice</h2></div>
+    <div class="stack-body pad">
+      <p class="sectionlabel">App language</p>
+      <div id="langList"></div>
+      <p class="hint" style="margin:0 0 16px 6px">Home, top-up, tabs and the voice readout are translated. Other screens are still in English. These translations need review by native speakers before launch.</p>
+      <div class="panel">
+        <div class="ph"><h3>Read my balance aloud</h3></div>
+        <div class="field" style="margin-bottom:12px"><label for="voiceSpeed">Speed</label>
+          <select id="voiceSpeed" onchange="state.voiceSlow=(this.value==='slow');save()"><option value="normal">Normal</option><option value="slow">Slow</option></select></div>
+        <button class="btn btn-dark" onclick="speakBalance()">Play my balance</button>
+        <p class="hint" style="margin-top:10px">You can also tap the speaker on the home balance card. Voice depends on the voices installed on the phone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOUSEHOLD -->
+  <section class="screen" id="screen-household">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Household</h2></div>
+    <div class="stack-body pad" id="hhBody"></div>
+  </section>
+
+  <!-- APPLIANCES -->
+  <section class="screen" id="screen-appliances">
+    <div class="topbar pad"><button class="iconbtn" onclick="go(lastAppScreen)" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><h2>Appliance estimator</h2></div>
+    <div class="app-body pad" id="applBody"></div>
+  </section>
+
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var TARIFF = 180; // naira per kWh, demo rate
+var RESERVE_KWH = 2; // credit that stays on the meter when sending to a neighbour
+var CONN_LIMIT = {hybrid:1.5, primary:3.0}; // kW per connection, demo assumption
+var PERMS = {owner:['view','topup','gift','manage'], topup:['view','topup'], view:['view']};
+var ROLE_LABEL = {owner:'Account holder', topup:'Can top up', view:'View only'};
+
+var state = {
+  connType:'hybrid', balance:1240, topupAmt:2000, onboarded:false,
+  name:'Lobar Lorenzo', phone:'0803 214 7765', street:'14 Adewale Street',
+  lang:'en', voiceSlow:false, lowData:false, offline:false,
+  household:[
+    {id:'m0', name:'Lobar Lorenzo', role:'owner', info:'Account holder'},
+    {id:'m1', name:'Ife Lorenzo', role:'topup', info:'0803 000 1122'},
+    {id:'m2', name:'Tobi Lorenzo', role:'view', info:'0803 000 3344'}
+  ],
+  viewAs:'m0',
+  auto:{on:false, threshold:5, amount:500, cap:5000, source:'wallet', spent:0},
+  ajo:{week:2, paid:['a1','a2','a4','a5']}, ajoCount:0,
+  gifted:0, read:{n4:true}, remind:{}, avatar:{type:'initial'},
+  notifs:null, dismissed:{},
+  gift:{to:'g1', kwh:2, meter:''},
+  queued:[], cachedAt:'', appl:null
+};
+var lastAppScreen = 'screen-home';
+var txFilter = 'all';
+var commCur = 'hub';
+
+/* ---------- Language ---------- */
+var I18N = {
+  en:{welcome:'Welcome back', balTitle:'Energy balance', topup:'Top up', services:'Services', hubUpdates:'Hub updates', meterCard:'Meter card', recent:'Recent activity', seeAll:'See all',
+    navHome:'Home', navTopup:'Top up', navCommunity:'Community', navActivity:'Activity', navProfile:'Profile',
+    chTopup:'Top up', chSend:'Send credit', chAjo:'Ajo', chAppl:'Appliances', chAuto:'Auto top-up', chWeather:'Weather', chNotices:'Notices', chOffline:'Offline and USSD', chHousehold:'Household', chLang:'Language and voice', chUsage:'Usage', chOutage:'Report outage',
+    curBal:'Current balance', orEnter:'Or enter an amount', titleActivity:'Activity', titleProfile:'Profile', titleNotif:'Notifications', titleCommunity:'Community', titleTopup:'Top up',
+    balSub:'About {k} kWh left, lasts ~{d} {days}', day:'day', days:'days', speak:'Your balance is {k} kilowatt-hours, about {n} naira.'},
+  pcm:{welcome:'Welcome back o', balTitle:'Your light balance', topup:'Buy light', services:'Wetin you fit do', hubUpdates:'Hub news', meterCard:'Your meter card', recent:'Wetin happen recently', seeAll:'See all',
+    navHome:'Home', navTopup:'Buy light', navCommunity:'Community', navActivity:'Activity', navProfile:'Me',
+    chTopup:'Buy light', chSend:'Share light', chAjo:'Ajo', chAppl:'Your appliances', chAuto:'Auto buy light', chWeather:'Weather', chNotices:'Notice', chOffline:'No data? Use USSD', chHousehold:'Una for house', chLang:'Language and voice', chUsage:'Light wey you use', chOutage:'Report light problem',
+    curBal:'Wetin remain for meter', orEnter:'Or put your own amount', titleActivity:'Wetin happen', titleProfile:'Your profile', titleNotif:'Alerts', titleCommunity:'Community', titleTopup:'Buy light',
+    balSub:'Around {k} kWh remain, e go last ~{d} {days}', day:'day', days:'days', speak:'Your light balance na {k} kilowatt-hour. E be like {n} naira.'},
+  yo:{welcome:'Káàbọ̀ padà', balTitle:'Ìwọ̀n iná rẹ', topup:'Ra iná', services:'Àwọn iṣẹ́', hubUpdates:'Ìròyìn ibùdó iná', meterCard:'Káàdì mítà', recent:'Àwọn ìgbòkègbodò àìpẹ́', seeAll:'Wo gbogbo rẹ̀',
+    navHome:'Ilé', navTopup:'Ra iná', navCommunity:'Àwùjọ', navActivity:'Ìgbòkègbodò', navProfile:'Èmi',
+    chTopup:'Ra iná', chSend:'Fi iná fún ẹlòmíràn', chAjo:'Àjọ', chAppl:'Àwọn ohun èlò', chAuto:'Ríra iná fúnra rẹ̀', chWeather:'Ojú ọjọ́', chNotices:'Àwọn ìkéde', chOffline:'USSD láìsí dátà', chHousehold:'Ará ilé', chLang:'Èdè àti ohùn', chUsage:'Ìlò iná', chOutage:'Ròyìn ìṣòro iná',
+    curBal:'Ohun tó wà báyìí', orEnter:'Tàbí kọ iye tìrẹ', titleActivity:'Ìgbòkègbodò', titleProfile:'Àkọọ́lẹ̀ mi', titleNotif:'Àwọn ìkìlọ̀', titleCommunity:'Àwùjọ', titleTopup:'Ra iná',
+    balSub:'Ó ku nǹkan bí {k} kWh, yóò tó ~{d} {days}', day:'ọjọ́', days:'ọjọ́', speak:'Ìwọ̀n iná rẹ ni {k} kilowatt-hour. Ó dọ́gba pẹ̀lú náírà {n}.'}
+};
+var LANG_NAMES = {en:['English','English'], pcm:['Pidgin','Naija Pidgin'], yo:['Yorùbá','Èdè Yorùbá']};
+function t(k, v){
+  var d = I18N[state.lang] || I18N.en;
+  var s = d[k] !== undefined ? d[k] : I18N.en[k];
+  if(s === undefined) return k;
+  if(v) Object.keys(v).forEach(function(x){ s = s.replace('{'+x+'}', v[x]); });
+  return s;
+}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = t(el.getAttribute('data-i18n')); });
+  renderNav(); renderChips(); renderHomeBalance();
+}
+function setLang(l){ state.lang = l; save(); applyI18n(); renderLang(); toast(LANG_NAMES[l][0]); }
+function renderLang(){
+  document.getElementById('langList').innerHTML = Object.keys(LANG_NAMES).map(function(l){
+    var sel = l===state.lang ? ' selected' : '';
+    return '<button class="pick'+sel+'" onclick="setLang(\''+l+'\')"><span class="avs">'+LANG_NAMES[l][0].charAt(0)+'</span><span class="grow"><div class="n">'+LANG_NAMES[l][1]+'</div><div class="s">'+I18N[l].welcome+'</div></span></button>';
+  }).join('');
+  document.getElementById('voiceSpeed').value = state.voiceSlow ? 'slow' : 'normal';
+}
+function speakBalance(){
+  var k = (state.balance/TARIFF).toFixed(1), n = Math.floor(state.balance).toLocaleString('en-NG');
+  var msg = t('speak', {k:k, n:n});
+  if(!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined'){ toast(msg); return; }
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(msg);
+    u.lang = state.lang==='yo' ? 'yo-NG' : 'en-NG';
+    u.rate = state.voiceSlow ? 0.8 : 1;
+    speechSynthesis.speak(u);
+    toast(msg);
+  }catch(e){ toast(msg); }
+}
+
+/* ---------- Icons, nav, chips ---------- */
+function ico(path, w){ w = w||19; return '<svg width="'+w+'" height="'+w+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+path+'</svg>'; }
+var P = {
+  bolt:'<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>',
+  bars:'<path d="M5 20V10M12 20V4M19 20v-7"/>',
+  home:'<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/>',
+  user:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.3-3.6 4-5.4 7-5.4s5.7 1.8 7 5.4"/>',
+  people:'<circle cx="9" cy="8" r="3"/><path d="M3 20c.8-3.2 3-5 6-5s5.2 1.8 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16.5 14.2c2.6.1 4.1 1.7 4.5 4.3"/>',
+  gift:'<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13h18M8 9c-2 0-3-3 0-3 2 0 4 3 4 3s2-3 4-3c3 0 2 3 0 3"/>',
+  plug:'<path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0V8ZM12 16v5"/>',
+  refresh:'<path d="M20 11a8 8 0 0 0-14.5-3.5L4 9M4 4v5h5M4 13a8 8 0 0 0 14.5 3.5L20 15M20 20v-5h-5"/>',
+  cloud:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 11a3.5 3.5 0 0 1-.5 7H7Z"/>',
+  mega:'<path d="M4 10v4l12 5V5L4 10ZM16 9a3 3 0 0 1 0 6M7 14v5"/>',
+  offline:'<path d="M2 2l20 20M5 12.5a10 10 0 0 1 4-2.4M19 12.5a10 10 0 0 0-3-2M8.5 16a5 5 0 0 1 2.3-1.3M15.5 16a5 5 0 0 0-1.3-1M12 20h.01"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  warn:'<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+  card:'<rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M8 21h8"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+  rain:'<path d="M7 15a4 4 0 0 1-.5-8A6 6 0 0 1 18 8a3.5 3.5 0 0 1-.5 7H7Z"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>',
+  check:'<path d="M4 12l6 6L20 6"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'
+};
+var navItems = [
+  ['navHome','screen-home','home'],
+  ['navTopup','screen-topup','bolt'],
+  ['navCommunity','screen-community','people'],
+  ['navActivity','screen-activity','bars'],
+  ['navProfile','screen-profile','user']
+];
+function renderNav(activeId){
+  activeId = activeId || lastAppScreen;
+  var html = navItems.map(function(it){
+    var active = it[1]===activeId ? ' active' : '';
+    return '<button class="navitem'+active+'" onclick="go(\''+it[1]+'\')"><span class="ico">'+ico(P[it[2]])+'</span><span>'+t(it[0])+'</span></button>';
+  }).join('');
+  document.querySelectorAll('.navbar').forEach(function(el){ el.innerHTML = html; });
+}
+var chipData = [
+  ['chTopup','bolt',"go('screen-topup')"],
+  ['chSend','gift',"go('screen-gift')"],
+  ['chAjo','people',"go('screen-ajo')"],
+  ['chAppl','plug',"go('screen-appliances')"],
+  ['chAuto','refresh',"go('screen-auto')"],
+  ['chWeather','cloud',"openCommunity('hub')"],
+  ['chNotices','mega',"openCommunity('notices')"],
+  ['chOffline','offline',"go('screen-offline')"],
+  ['chHousehold','home',"go('screen-household')"],
+  ['chLang','globe',"go('screen-language')"],
+  ['chUsage','bars',"go('screen-activity')"],
+  ['chOutage','warn',"go('screen-offline')"]
+];
+function renderChips(){
+  document.getElementById('chips').innerHTML = chipData.map(function(c){
+    return '<button class="chip" onclick="'+c[2]+'"><span class="ci">'+ico(P[c[1]],15)+'</span>'+t(c[0])+'</button>';
+  }).join('');
+}
+
+/* ---------- Transactions ---------- */
+var txData = [
+  {label:'Usage deducted', sub:'Today, 7:42 AM', amt:-414, kind:'usage'},
+  {label:'Top-up', sub:'Yesterday, 6:15 PM', amt:2000, kind:'topup'},
+  {label:'Usage deducted', sub:'Yesterday, 7:50 AM', amt:-378, kind:'usage'},
+  {label:'Usage deducted', sub:'Oct 26, 8:10 PM', amt:-324, kind:'usage'},
+  {label:'Connection payment', sub:'Oct 22, 9:00 AM', amt:-15000, kind:'conn'}
+];
+var KIND_ICON = {topup:'up', conn:'card', usage:'bolt', gift:'gift', ajo:'people', auto:'refresh'};
+var FILTERS = {all:null, topup:['topup','auto'], usage:['usage'], shared:['gift','ajo']};
+function txIcon(kind){ return ico(P[KIND_ICON[kind]||'bolt'], 17); }
+function fmtNaira(n){ var neg = n<0; n = Math.abs(n); return (neg?'−':'+')+'₦'+n.toLocaleString('en-NG'); }
+function addTx(label, amt, kind, sub){ txData.unshift({label:label, sub:sub||'Just now', amt:amt, kind:kind}); }
+function renderTx(containerId, limit, filter){
+  var kinds = FILTERS[filter||'all'];
+  var list = txData.filter(function(x){ return !kinds || kinds.indexOf(x.kind)>-1; });
+  if(limit) list = list.slice(0, limit);
+  var el = document.getElementById(containerId);
+  if(!list.length){ el.innerHTML = '<div class="txempty">No transactions yet</div>'; return; }
+  el.innerHTML = list.map(function(x){
+    return '<button class="txrow tx-click" onclick="openTx(\''+txId(x)+'\')" aria-haspopup="dialog"><div class="txicon '+x.kind+'">'+txIcon(x.kind)+'</div>'+
+      '<div class="txmeta"><div class="t1">'+x.label+'</div><div class="t2">'+x.sub+'</div></div>'+
+      '<div class="txamt tnum '+(x.amt>0?'pos':'')+'">'+fmtNaira(x.amt)+'</div></button>';
+  }).join('');
+}
+function setFilter(f){
+  txFilter = f;
+  document.querySelectorAll('#seg button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-f')===f); });
+  renderTx('activityTx', 0, f);
+}
+
+var usage = [0.8,2.4,1.2,2.9,1.8,2.1,2.3]; // kWh per day, oldest to today (sample data)
+function dayLabels(){
+  var letters = ['S','M','T','W','T','F','S'], today = new Date().getDay();
+  return usage.map(function(v,i){ return letters[(today - (usage.length-1-i) + 14) % 7]; });
+}
+function renderChart(){
+  var labels = dayLabels();
+  var max = Math.max.apply(null, usage);
+  var w=300, barW=26, gap=(w-usage.length*barW)/(usage.length+1), svg='';
+  usage.forEach(function(v,i){
+    var bh = Math.max(6, Math.round((v/max)*62));
+    var x = gap + i*(barW+gap), y = 96 - bh;
+    var isToday = i===usage.length-1;
+    svg += '<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+bh+'" rx="9" style="fill:'+(isToday?'var(--ink)':'url(#barGrad)')+'"/>';
+    svg += '<text x="'+(x+barW/2)+'" y="'+(y-6)+'" text-anchor="middle" font-size="9.5" style="fill:var(--ink-dim)" font-family="DM Mono,monospace">'+v.toFixed(1)+'</text>';
+    svg += '<text x="'+(x+barW/2)+'" y="116" text-anchor="middle" font-size="11" font-weight="600" style="fill:'+(isToday?'var(--ink)':'var(--ink-dim)')+'" font-family="DM Sans,sans-serif">'+labels[i]+'</text>';
+  });
+  document.getElementById('barChart').innerHTML = svg;
+  var total = usage.reduce(function(a,b){return a+b;},0);
+  document.getElementById('chartSub').textContent = total.toFixed(1)+' kWh used · ₦'+Math.round(total*TARIFF).toLocaleString('en-NG')+' spent (sample data)';
+  var rows = usage.map(function(v,i){ return '<div class="txrow"><div class="txmeta"><div class="t1">'+(i===usage.length-1?'Today':'Day '+(i+1))+'</div></div><div class="txamt tnum">'+v.toFixed(1)+' kWh</div></div>'; }).reverse().join('');
+  document.getElementById('usageTable').innerHTML = rows;
+}
+
+/* ---------- Navigation ---------- */
+var TABS = ['screen-home','screen-topup','screen-community','screen-activity','screen-profile'];
+var HOOKS = {
+  'screen-notif':function(){ renderNotifs(); },
+  'screen-home':function(){ renderHomeExtras(); renderBellBadge(); },
+  'screen-topup':function(){ document.getElementById('topupBal').textContent = '₦'+Math.floor(state.balance).toLocaleString('en-NG'); },
+  'screen-community':function(){ renderCommunity(); },
+  'screen-gift':function(){ renderGift(); },
+  'screen-ajo':function(){ renderAjo(); },
+  'screen-auto':function(){ renderAuto(); },
+  'screen-offline':function(){ renderOffline(); },
+  'screen-language':function(){ renderLang(); },
+  'screen-household':function(){ renderHousehold(); },
+  'screen-appliances':function(){ renderAppl(); }
+};
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  if(TABS.indexOf(id)>-1){ lastAppScreen = id; renderNav(id); }
+  var body = document.querySelector('#'+id+' .app-body, #'+id+' .stack-body');
+  if(body) body.scrollTop = 0;
+  if(HOOKS[id]) HOOKS[id]();
+  save();
+}
+function openCommunity(tab){ commCur = tab; go('screen-community'); }
+
+/* ---------- Onboarding swipe ---------- */
+var obIndex = 0, obDrag = null;
+function obRender(dx){
+  var slides = document.querySelectorAll('.ob-slide');
+  var dots = document.querySelectorAll('#obDots .dot');
+  slides.forEach(function(s,i){ s.style.transform = 'translateX(calc(' + ((i-obIndex)*100) + '% + ' + (dx||0) + 'px))'; });
+  dots.forEach(function(d,i){ d.classList.toggle('active', i===obIndex); });
+  document.getElementById('obNext').textContent = obIndex===slides.length-1 ? 'Continue' : 'Next';
+}
+function obGo(i){ var n = document.querySelectorAll('.ob-slide').length; obIndex = Math.max(0, Math.min(n-1, i)); obRender(0); }
+function obNext(){ var n = document.querySelectorAll('.ob-slide').length; if(obIndex < n-1) obGo(obIndex+1); else go('screen-signup'); }
+function initOnboardSwipe(){
+  var box = document.getElementById('obSlides');
+  var n = document.querySelectorAll('.ob-slide').length;
+  box.addEventListener('pointerdown', function(e){
+    obDrag = {x:e.clientX, id:e.pointerId, dx:0};
+    box.classList.add('dragging');
+    try{ box.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  box.addEventListener('pointermove', function(e){
+    if(!obDrag || e.pointerId!==obDrag.id) return;
+    var dx = e.clientX - obDrag.x;
+    if((obIndex===0 && dx>0) || (obIndex===n-1 && dx<0)) dx = dx*0.3;
+    obDrag.dx = dx; obRender(dx);
+  });
+  function end(e){
+    if(!obDrag || e.pointerId!==obDrag.id) return;
+    var dx = obDrag.dx, w = box.offsetWidth || 300;
+    obDrag = null; box.classList.remove('dragging');
+    if(dx < -Math.min(60, w*0.2)) obGo(obIndex+1);
+    else if(dx > Math.min(60, w*0.2)) obGo(obIndex-1);
+    else obRender(0);
+  }
+  box.addEventListener('pointerup', end);
+  box.addEventListener('pointercancel', end);
+  document.querySelectorAll('#obDots .dot').forEach(function(d,i){ d.addEventListener('click', function(){ obGo(i); }); });
+  document.addEventListener('keydown', function(e){
+    if(!document.getElementById('screen-onboard').classList.contains('active')) return;
+    if(e.key==='ArrowRight') obGo(obIndex+1);
+    if(e.key==='ArrowLeft') obGo(obIndex-1);
+  });
+  obRender(0);
+}
+
+/* ---------- Connection and payment ---------- */
+function selectConn(type){
+  state.connType = type;
+  document.getElementById('ctHybrid').classList.toggle('selected', type==='hybrid');
+  document.getElementById('ctPrimary').classList.toggle('selected', type==='primary');
+  updatePaymentSummary();
+}
+document.addEventListener('keydown', function(e){
+  if((e.key==='Enter'||e.key===' ') && e.target && e.target.classList && e.target.classList.contains('ctype')){ e.preventDefault(); e.target.click(); }
+});
+function selectPay(el){
+  document.querySelectorAll('.paymethod').forEach(function(p){ p.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+function planName(){ return state.connType==='primary' ? 'Primary (Full)' : 'Hybrid (Backup)'; }
+function updatePaymentSummary(){
+  var amt = state.connType==='primary' ? 25000 : 15000;
+  document.getElementById('payPlanLabel').textContent = planName()+' connection';
+  document.getElementById('payPlanAmt').textContent = '₦'+amt.toLocaleString('en-NG');
+  document.getElementById('payTotal').textContent = '₦'+amt.toLocaleString('en-NG');
+  document.getElementById('payBtnLabel').textContent = 'Pay ₦'+amt.toLocaleString('en-NG');
+  state._connFee = amt;
+}
+function pay(){
+  updatePaymentSummary();
+  var btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  document.getElementById('payBtnLabel').innerHTML = '<span class="spin"></span> Processing…';
+  setTimeout(function(){
+    btn.disabled = false;
+    document.getElementById('payBtnLabel').textContent = 'Pay ₦'+state._connFee.toLocaleString('en-NG');
+    go('screen-paysuccess');
+  }, 1200);
+}
+function applyProfile(){
+  var name = state.name || 'Lobar Lorenzo';
+  state.household[0].name = name;
+  document.getElementById('homeName').textContent = name;
+  document.getElementById('mcName').textContent = name;
+  document.getElementById('profName').textContent = name;
+  var init = name.trim().charAt(0).toUpperCase() || 'L';
+  paintAvatars();
+  document.getElementById('profPhone').textContent = state.phone;
+  document.getElementById('profStreet').textContent = state.street;
+  document.getElementById('profPlan').textContent = planName();
+  document.getElementById('mcPlan').textContent = planName();
+}
+function enterApp(){
+  state.onboarded = true;
+  state.name = document.getElementById('inpName').value.trim() || state.name;
+  state.phone = document.getElementById('inpPhone').value.trim() || state.phone;
+  state.street = document.getElementById('inpStreet').value.trim() || state.street;
+  applyProfile();
+  go('screen-home');
+}
+
+/* ---------- Permissions (shared household) ---------- */
+function viewer(){
+  for(var i=0;i<state.household.length;i++) if(state.household[i].id===state.viewAs) return state.household[i];
+  return state.household[0];
+}
+function can(a){ return PERMS[viewer().role].indexOf(a) > -1; }
+function guard(a){
+  if(can(a)) return true;
+  var v = viewer();
+  toast(v.name.split(' ')[0]+' ('+ROLE_LABEL[v.role]+') cannot do this. Ask the account holder.');
+  return false;
+}
+function needOnline(what, code){
+  if(!state.offline) return true;
+  toast("You're offline. Use USSD to "+what+'.');
+  openUssd(code || '*347#');
+  return false;
+}
+
+/* ---------- Top-up ---------- */
+var amtPresets = [1000,2000,5000,10000];
+function renderAmtGrid(){
+  document.getElementById('amtGrid').innerHTML = amtPresets.map(function(a){
+    var sel = a===state.topupAmt ? ' selected' : '';
+    return '<button class="amtbtn'+sel+'" onclick="pickAmt('+a+')"><div class="n tnum">₦'+a.toLocaleString('en-NG')+'</div><div class="k">'+(a/TARIFF).toFixed(1)+' kWh</div></button>';
+  }).join('');
+}
+function pickAmt(a){ state.topupAmt = a; document.getElementById('customAmt').value = ''; renderAmtGrid(); updateTopupUI(); }
+function customAmt(v){
+  var n = parseInt(v,10);
+  if(n>0){ state.topupAmt = n; document.querySelectorAll('.amtbtn').forEach(function(b){b.classList.remove('selected')}); }
+  updateTopupUI();
+}
+function topupWith(amt){
+  state.topupAmt = amt;
+  document.getElementById('customAmt').value = amtPresets.indexOf(amt)>-1 ? '' : amt;
+  renderAmtGrid(); updateTopupUI();
+  go('screen-topup');
+}
+function updateTopupUI(){
+  document.getElementById('kwhPill').textContent = '= '+(state.topupAmt/TARIFF).toFixed(1)+' kWh at ₦'+TARIFF+'/kWh';
+  document.getElementById('topupBtnLabel').textContent = 'Top up ₦'+state.topupAmt.toLocaleString('en-NG');
+}
+function doTopup(){
+  if(!guard('topup')) return;
+  if(!needOnline('top up', '*347*2#')) return;
+  var btn = document.getElementById('topupBtn');
+  btn.disabled = true;
+  document.getElementById('topupBtnLabel').innerHTML = '<span class="spin"></span> Processing…';
+  setTimeout(function(){
+    state.balance += state.topupAmt;
+    addTx('Top-up', state.topupAmt, 'topup');
+    btn.disabled = false;
+    updateTopupUI();
+    refreshBalanceViews();
+    go('screen-home');
+    toast('Top-up successful: '+(state.topupAmt/TARIFF).toFixed(1)+' kWh added');
+  }, 1200);
+}
+function refreshBalanceViews(){
+  renderHomeBalance();
+  renderTx('homeTx', 3);
+  renderTx('activityTx', 0, txFilter);
+  document.getElementById('topupBal').textContent = '₦'+Math.floor(state.balance).toLocaleString('en-NG');
+  renderWxAlert();
+  save();
+}
+function renderHomeBalance(){
+  document.querySelector('#screen-home .balance').innerHTML = '₦'+Math.floor(state.balance).toLocaleString('en-NG')+'<span class="cents">.00</span>';
+  var kwh = (state.balance/TARIFF).toFixed(1);
+  var d = Math.max(1, Math.round(state.balance/TARIFF/2.3));
+  document.querySelector('#screen-home .balance-sub').textContent = t('balSub', {k:kwh, d:d, days:(d===1?t('day'):t('days'))});
+}
+
+/* ---------- Auto top-up ---------- */
+function maybeAutoTopup(){
+  var a = state.auto;
+  if(!a.on || state.offline) return false;
+  if(state.balance/TARIFF >= a.threshold) return false;
+  if(a.spent + a.amount > a.cap){ toast('Auto top-up paused: monthly limit reached'); return false; }
+  state.balance += a.amount; a.spent += a.amount;
+  addTx('Auto top-up', a.amount, 'auto', 'Just now · below '+a.threshold+' kWh');
+  refreshBalanceViews();
+  toast('Auto top-up: ₦'+a.amount.toLocaleString('en-NG')+' added so the lights stay on');
+  return true;
+}
+function setAuto(key, val){
+  if(!guard('manage')){ renderAuto(); return; }
+  var a = state.auto;
+  if(key==='on') a.on = !!val;
+  else if(key==='source') a.source = val;
+  else a[key] = parseInt(val,10);
+  save(); renderAuto();
+}
+function renderAuto(){
+  var a = state.auto;
+  document.getElementById('autoOn').checked = a.on;
+  document.getElementById('autoThreshold').value = String(a.threshold);
+  document.getElementById('autoAmount').value = String(a.amount);
+  document.getElementById('autoSource').value = a.source;
+  document.getElementById('autoCap').value = String(a.cap);
+  var src = a.source==='wallet' ? 'your mobile money wallet' : 'your bank account';
+  document.getElementById('autoSummary').textContent = a.on
+    ? 'Adds ₦'+a.amount.toLocaleString('en-NG')+' from '+src+' when you drop below '+a.threshold+' kWh.'
+    : 'Off. Turn on so the lights never cut out at night.';
+  document.getElementById('autoSpent').textContent = 'Used this month: ₦'+a.spent.toLocaleString('en-NG')+' of ₦'+a.cap.toLocaleString('en-NG');
+}
+function tryAuto(){
+  if(!state.auto.on){ toast('Turn on auto top-up first'); return; }
+  state.balance = 4.5*TARIFF;
+  refreshBalanceViews();
+  setTimeout(maybeAutoTopup, 500);
+}
+
+/* ---------- Send credit (P2P) ---------- */
+var GIFT_TO = [
+  {id:'g1', name:"Mama Tolu's Kiosk", meter:'LRZ-OG-0118', sub:'No. 18 · Small business'},
+  {id:'g2', name:'Mr. Bello', meter:'LRZ-OG-0111', sub:'No. 16 · Household'},
+  {id:'g3', name:'Grace Chapel', meter:'LRZ-OG-0122', sub:'No. 22 · Place of worship'}
+];
+function giftAvailKwh(){ return Math.max(0, Math.floor((state.balance/TARIFF - RESERVE_KWH)*10)/10); }
+function giftRecipient(){
+  var g = state.gift;
+  if(g.meter && /^LRZ-OG-\d{4}$/i.test(g.meter)) return {name:g.meter.toUpperCase(), meter:g.meter.toUpperCase()};
+  for(var i=0;i<GIFT_TO.length;i++) if(GIFT_TO[i].id===g.to) return GIFT_TO[i];
+  return null;
+}
+function giftMeterInput(v){
+  state.gift.meter = v.trim();
+  if(/^LRZ-OG-\d{4}$/i.test(state.gift.meter)) state.gift.to = '';
+  renderGift(true);
+}
+function pickGiftTo(id){ state.gift.to = id; state.gift.meter = ''; document.getElementById('giftMeter').value = ''; renderGift(); }
+function pickGiftKwh(k){ state.gift.kwh = k; renderGift(true); }
+function renderGift(keepInput){
+  var avail = giftAvailKwh();
+  document.getElementById('giftAvail').textContent = avail.toFixed(1)+' kWh';
+  document.getElementById('giftNote').textContent = 'Your balance is '+(state.balance/TARIFF).toFixed(1)+' kWh. '+RESERVE_KWH+' kWh always stays on your meter.';
+  document.getElementById('giftRecipients').innerHTML = GIFT_TO.map(function(r){
+    var sel = r.id===state.gift.to ? ' selected' : '';
+    return '<button class="pick'+sel+'" onclick="pickGiftTo(\''+r.id+'\')"><span class="avs">'+r.name.charAt(0)+'</span><span class="grow"><div class="n">'+r.name+'</div><div class="s">'+r.sub+'</div></span></button>';
+  }).join('');
+  var amounts = [1,2,3,5];
+  document.getElementById('giftPills').innerHTML = amounts.map(function(k){
+    return '<button class="pill'+(k===state.gift.kwh?' on':'')+'"'+(k>avail?' disabled':'')+' onclick="pickGiftKwh('+k+')">'+k+' kWh</button>';
+  }).join('');
+  var k = state.gift.kwh, r = giftRecipient();
+  var ok = r && k<=avail;
+  document.getElementById('giftSummary').textContent = k+' kWh = ₦'+(k*TARIFF).toLocaleString('en-NG')+' · you keep '+(state.balance/TARIFF-k).toFixed(1)+' kWh';
+  var btn = document.getElementById('giftBtn');
+  btn.disabled = !ok;
+  document.getElementById('giftBtnLabel').textContent = !r ? 'Choose who to send to' : (k>avail ? 'Not enough spare credit' : 'Send '+k+' kWh to '+r.name);
+}
+function doGift(){
+  if(!guard('gift') || !needOnline('send credit')) return;
+  var k = state.gift.kwh, r = giftRecipient();
+  if(!r || k>giftAvailKwh()) return;
+  state.balance -= k*TARIFF;
+  state.gifted += k;
+  addTx('Sent to '+r.name, -k*TARIFF, 'gift');
+  document.getElementById('giftMsg').value = '';
+  refreshBalanceViews();
+  go('screen-home');
+  toast('Sent '+k+' kWh to '+r.name+'. They get an SMS.');
+  setTimeout(maybeAutoTopup, 600);
+}
+
+/* ---------- Ajo (thrift savings) ---------- */
+var AJO_PER = 1000;
+var AJO_MEMBERS = [{id:'a1',n:"Mama Tolu's Kiosk"},{id:'a2',n:'Mr. Bello'},{id:'me',n:'You'},{id:'a4',n:'Grace Chapel'},{id:'a5',n:'Eze Pharmacy'},{id:'a6',n:'Mrs. Adeyemi'}];
+function ajoRecipient(){ return AJO_MEMBERS[(state.ajo.week-1) % AJO_MEMBERS.length]; }
+function renderAjo(){
+  var a = state.ajo, paid = a.paid.length, total = AJO_PER*AJO_MEMBERS.length, rec = ajoRecipient();
+  var mePaid = a.paid.indexOf('me')>-1;
+  var h = '<div class="ajohead warm"><div class="gn">Adewale Street Ajo</div><div class="gs">₦'+AJO_PER.toLocaleString('en-NG')+' each, every week · '+AJO_MEMBERS.length+' members</div>'+
+    '<div class="pot tnum">₦'+(paid*AJO_PER).toLocaleString('en-NG')+' <small>of ₦'+total.toLocaleString('en-NG')+'</small></div>'+
+    '<div class="bar"><i style="width:'+Math.round(paid/AJO_MEMBERS.length*100)+'%"></i></div>'+
+    '<div class="gr">Week '+a.week+': the full pot goes to <b>'+(rec.id==='me'?'your':rec.n+"'s")+' energy balance</b>.</div></div>';
+  h += '<div class="panel"><div class="ph"><h3>Paid this week</h3><span class="tagchip acc">'+paid+' of '+AJO_MEMBERS.length+'</span></div>';
+  h += AJO_MEMBERS.map(function(m){
+    var p = a.paid.indexOf(m.id)>-1;
+    return '<div class="mem"><span class="avs">'+m.n.charAt(0)+'</span><span class="n">'+m.n+'</span><span class="tagchip '+(p?'ok':'')+'">'+(p?'Paid':'Pending')+'</span></div>';
+  }).join('') + '</div>';
+  h += '<div class="panel"><div class="ph"><h3>Who gets the pot</h3></div>';
+  h += AJO_MEMBERS.map(function(m,i){
+    var wk = i+1, chip = wk<a.week ? '<span class="tagchip ok">Paid out</span>' : (wk===a.week ? '<span class="tagchip acc">This week</span>' : '<span class="tagchip">Week '+wk+'</span>');
+    return '<div class="mem"><span class="n"'+(m.id==='me'?' style="color:var(--accent-ink)"':'')+'>Week '+wk+' · '+m.n+'</span>'+chip+'</div>';
+  }).join('') + '</div>';
+  h += '<p class="hint" style="padding-left:6px">Small, regular payments add up to a full month of power. Your payout is added straight to your energy balance.</p>';
+  h += '<button class="linkbtn" onclick="ajoJump()">Demo: jump to my payout week</button> <button class="linkbtn" onclick="toast(\'Demo only: group set-up is not wired up\')">Start or join a group</button>';
+  document.getElementById('ajoBody').innerHTML = h;
+  var btn = document.getElementById('ajoBtn');
+  btn.disabled = mePaid;
+  document.getElementById('ajoBtnLabel').textContent = mePaid ? 'You have paid for week '+a.week : 'Contribute ₦'+AJO_PER.toLocaleString('en-NG');
+}
+function ajoJump(){ state.ajo.week = 3; state.ajo.paid = ['a1','a2','a4','a5','a6']; renderAjo(); toast('Week 3: you are next to receive the pot'); }
+function contributeAjo(){
+  var a = state.ajo;
+  if(a.paid.indexOf('me')>-1) return;
+  if(!guard('topup') || !needOnline('pay')) return;
+  var btn = document.getElementById('ajoBtn');
+  btn.disabled = true;
+  document.getElementById('ajoBtnLabel').innerHTML = '<span class="spin"></span> Processing…';
+  setTimeout(function(){
+    a.paid.push('me'); state.ajoCount++;
+    var done = a.paid.length >= AJO_MEMBERS.length;
+    if(done){
+      var rec = ajoRecipient(), pot = AJO_PER*AJO_MEMBERS.length;
+      if(rec.id==='me'){
+        state.balance += pot; addTx('Ajo payout', pot, 'ajo');
+        refreshBalanceViews();
+        toast('Pot complete: ₦'+pot.toLocaleString('en-NG')+' added to your energy balance');
+      } else {
+        toast('Pot complete: ₦'+pot.toLocaleString('en-NG')+' sent to '+rec.n);
+      }
+      a.week = a.week % AJO_MEMBERS.length + 1; a.paid = [];
+    } else {
+      toast('Thanks. ₦'+AJO_PER.toLocaleString('en-NG')+' added to this week\'s pot');
+    }
+    save(); renderAjo();
+  }, 1100);
+}
+
+/* ---------- Community: hub, forecast, leaderboard, badges, notices ---------- */
+function gen(h){ return (h<6.5||h>18.5) ? 0 : 32*Math.pow(Math.sin(Math.PI*(h-6.5)/12),1.4); }
+function use(h){ return 7 + 5*Math.exp(-Math.pow(h-8,2)/3) + 6*Math.exp(-Math.pow(h-13,2)/12) + 13*Math.exp(-Math.pow(h-20,2)/5); }
+function batt(h){ if(h<6) return 35; if(h<15) return Math.min(100,35+(h-6)*7.2); if(h<22) return 100-(h-15)*9; return 37; }
+function nowHour(){ var d = new Date(); return d.getHours()+d.getMinutes()/60; }
+function renderHubStats(){
+  var h = nowHour();
+  document.getElementById('hubStats').innerHTML =
+    '<div class="stat"><div class="v">'+gen(h).toFixed(1)+' kW</div><div class="k">Solar now</div></div>'+
+    '<div class="stat"><div class="v">'+use(h).toFixed(1)+' kW</div><div class="k">Street using</div></div>'+
+    '<div class="stat"><div class="v">'+Math.round(batt(h))+'%</div><div class="k">Battery</div></div>';
+  var X = function(x){ return 12+(x-5)/(23-5)*276; }, Y = function(v){ return 108-(v/36)*96; };
+  var gp = 'M'+X(5)+','+Y(0), up = '', x;
+  for(x=5; x<=23.01; x+=0.5){
+    gp += ' L'+X(x).toFixed(1)+','+Y(gen(x)).toFixed(1);
+    up += (x===5?'M':' L')+X(x).toFixed(1)+','+Y(use(x)).toFixed(1);
+  }
+  var cx = Math.max(5, Math.min(23, h));
+  var s = '<line x1="12" y1="108" x2="288" y2="108" style="stroke:var(--line)"/>';
+  s += '<path d="'+gp+' L'+X(23)+','+Y(0)+' Z" style="fill:var(--accent-soft);stroke:var(--accent)" stroke-width="2"/>';
+  s += '<path d="'+up+'" fill="none" style="stroke:var(--ink)" stroke-width="2" stroke-linejoin="round"/>';
+  s += '<line x1="'+X(cx)+'" y1="10" x2="'+X(cx)+'" y2="108" style="stroke:var(--ink-dim)" stroke-dasharray="3 3"/>';
+  s += '<circle cx="'+X(cx)+'" cy="'+Y(gen(cx))+'" r="4" style="fill:var(--accent)"/><circle cx="'+X(cx)+'" cy="'+Y(use(cx))+'" r="4" style="fill:var(--ink)"/>';
+  [[6,'6 AM'],[12,'12 PM'],[18,'6 PM'],[22.5,'10 PM']].forEach(function(l){
+    s += '<text x="'+X(l[0])+'" y="126" text-anchor="middle" font-size="10" style="fill:var(--ink-dim)" font-family="DM Mono,monospace">'+l[1]+'</text>';
+  });
+  document.getElementById('hubChart').innerHTML = s;
+}
+
+var FORECAST_PCT = [85,70,35,40,75]; // expected solar output %, starting tomorrow (sample data)
+function wxIcon(p){ return ico(p>=70 ? P.sun : (p>=40 ? P.cloud : P.rain), 22); }
+function forecastDays(){
+  return FORECAST_PCT.map(function(p,i){
+    var d = new Date(); d.setDate(d.getDate()+i+1);
+    return {name:d.toLocaleDateString('en-NG',{weekday:'short'}), full:d.toLocaleDateString('en-NG',{weekday:'long'}), pct:p};
+  });
+}
+function wxAdvice(){
+  var days = forecastDays(), low = days.filter(function(d){ return d.pct<50; });
+  if(!low.length) return null;
+  var need = 3*2.3*1.5, gap = Math.max(0, need - state.balance/TARIFF);
+  var amt = gap>0 ? Math.ceil(gap*TARIFF/500)*500 : 0;
+  var names = low.map(function(d){ return d.full; });
+  var list = names.length>1 ? names.slice(0,-1).join(', ')+' and '+names[names.length-1] : names[0];
+  return {low:low, list:list, amt:amt, pct:Math.min.apply(null, low.map(function(d){return d.pct;}))};
+}
+function renderForecast(){
+  var days = forecastDays(), adv = wxAdvice();
+  var h = '<div class="ph"><h3>Solar forecast</h3><span class="tagchip">Sample data</span></div><div class="fc">';
+  h += days.map(function(d){ return '<div class="fcd'+(d.pct<50?' low':'')+'"><div class="dn">'+d.name+'</div>'+wxIcon(d.pct)+'<div class="pc">'+d.pct+'%</div></div>'; }).join('');
+  h += '</div>';
+  if(adv){
+    h += '<div class="notebar alert"><div class="grow"><b>Cloudy: '+adv.list+'.</b> Solar output may fall to about '+adv.pct+'%. '+(adv.amt>0 ? 'Top up ₦'+adv.amt.toLocaleString('en-NG')+' beforehand to cover about 3 days.' : 'Your balance already covers a few cloudy days.')+'</div>'+(adv.amt>0 ? '<button onclick="topupWith('+adv.amt+')">Top up</button>' : '')+'</div>';
+  } else {
+    h += '<p class="hint" style="margin-top:10px">Clear skies ahead. No action needed.</p>';
+  }
+  h += '<p class="hint" style="margin-top:10px">Percent is expected solar output against a clear day. A live weather feed replaces this sample at launch.</p>';
+  document.getElementById('forecastPanel').innerHTML = h;
+}
+function dismissed(){ if(!state.dismissed) state.dismissed = {}; return state.dismissed; }
+function homeCards(){
+  var out = [], adv = wxAdvice(), d = dismissed();
+  if(adv && !d['wx:'+adv.list]){
+    out.push({key:'wx:'+adv.list, cls:'alert', html:'<b>Cloudy '+adv.list+'.</b> '+(adv.amt>0 ? 'Top up ₦'+adv.amt.toLocaleString('en-NG')+' to be safe.' : 'Your balance covers it.'),
+      btn:adv.amt>0?'Top up':'Details', act:adv.amt>0?'topupWith('+adv.amt+')':"openCommunity('hub')"});
+  }
+  var un = notifs().filter(function(n){ return !n.read; }).length;
+  if(un>0 && !d['nt:'+un]){
+    out.push({key:'nt:'+un, cls:'info', html:'<b>'+un+' unread notification'+(un>1?'s':'')+'.</b> Tap to catch up.', btn:'View', act:"go('screen-notif')"});
+  }
+  if(!d['tip:midday']){
+    out.push({key:'tip:midday', cls:'info', html:'<b>Tip.</b> Run heavy loads at midday to stretch your credit.', btn:'Estimate', act:"go('screen-appliances')"});
+  }
+  return out;
+}
+function dismissHomeCard(k){ dismissed()[k] = true; save(); renderWxAlert(); }
+function renderWxAlert(){
+  var el = document.getElementById('wxAlert'); if(!el) return;
+  var cards = homeCards();
+  if(!cards.length){ el.innerHTML = ''; return; }
+  var X = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  var h = '<div class="hc-rail" id="hcRail" onscroll="hcDots()">'+cards.map(function(c){
+    return '<div class="notebar '+c.cls+' hc-card"><div class="grow">'+c.html+'</div><button onclick="'+c.act+'">'+c.btn+'</button></div>';
+  }).join('')+'</div>';
+  if(cards.length>1) h += '<div class="hc-dots" id="hcDots">'+cards.map(function(_,i){ return '<i'+(i===0?' class="on"':'')+'></i>'; }).join('')+'</div>';
+  el.innerHTML = h;
+  hcAuto();
+}
+var hcTimer, hcPause = false;
+function hcAuto(){
+  clearInterval(hcTimer);
+  var r = document.getElementById('hcRail');
+  if(!r || r.children.length<2) return;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  ['touchstart','pointerdown','mouseenter','focusin'].forEach(function(e){ r.addEventListener(e, function(){ hcPause = true; }, {passive:true}); });
+  ['touchend','touchcancel','mouseleave','focusout'].forEach(function(e){ r.addEventListener(e, function(){ setTimeout(function(){ hcPause = false; }, 2500); }, {passive:true}); });
+  hcTimer = setInterval(function(){
+    var rail = document.getElementById('hcRail');
+    if(!rail){ clearInterval(hcTimer); return; }
+    if(hcPause || rail.offsetParent===null) return;
+    var n = rail.children.length, i = Math.round(rail.scrollLeft/rail.clientWidth);
+    rail.scrollTo({left:((i+1)%n)*rail.clientWidth, behavior:'smooth'});
+  }, 4500);
+}
+function hcDots(){
+  var r = document.getElementById('hcRail'), ds = document.querySelectorAll('#hcDots i'); if(!r||!ds.length) return;
+  var i = Math.round(r.scrollLeft / r.clientWidth);
+  ds.forEach(function(d,j){ d.classList.toggle('on', j===i); });
+}
+var LEADERS = [{n:'No. 18',s:92},{n:'No. 11',s:88},{n:'No. 14 (you)',s:84,me:true},{n:'No. 22',s:77},{n:'No. 7',s:71},{n:'No. 9',s:64}];
+function renderLeaderboard(){
+  document.getElementById('leaderboard').innerHTML = LEADERS.map(function(l,i){
+    return '<div class="lb'+(l.me?' me':'')+'"><span class="rk">'+(i+1)+'</span><span class="n">'+l.n+'</span><span class="pts">'+l.s+'%</span></div>';
+  }).join('');
+}
+function badgeList(){
+  var readCount = Object.keys(state.read).filter(function(k){return state.read[k];}).length;
+  return [
+    {n:'Midday Saver', d:'Use half your power between 10 AM and 4 PM for 7 days.', cur:7, max:7, icon:'sun'},
+    {n:'Steady Saver', d:'Stay under 2 kWh a day for 5 days.', cur:3, max:5, icon:'bars'},
+    {n:'Neighbourly', d:'Send credit to a neighbour.', cur:Math.min(1,state.gifted>0?1:0), max:1, icon:'gift'},
+    {n:'Thrift Star', d:'Make 4 Ajo contributions.', cur:Math.min(4,state.ajoCount), max:4, icon:'people'},
+    {n:'Always On', d:'Turn on auto top-up.', cur:state.auto.on?1:0, max:1, icon:'refresh'},
+    {n:'In the Know', d:'Read 3 hub notices.', cur:Math.min(3,readCount), max:3, icon:'mega'}
+  ];
+}
+function renderBadges(){
+  var list = badgeList(), earned = list.filter(function(b){return b.cur>=b.max;}).length;
+  var h = '<p class="hint" style="margin:0 0 12px 6px">'+earned+' of '+list.length+' earned</p><div class="badges">';
+  h += list.map(function(b){
+    var ok = b.cur>=b.max;
+    return '<div class="badge'+(ok?' earned':'')+'"><span class="bi">'+ico(P[b.icon],22)+'</span><div class="bn">'+b.n+'</div><div class="bd">'+b.d+'</div>'+
+      (ok ? '<span class="tagchip ok" style="align-self:flex-start">Earned</span>' : '<div class="bar"><i style="width:'+Math.round(b.cur/b.max*100)+'%"></i></div><div class="bp">'+b.cur+' / '+b.max+'</div>')+'</div>';
+  }).join('') + '</div>';
+  document.getElementById('comm-badges').innerHTML = h;
+}
+var NOTICES = [
+  {id:'n1', type:'Maintenance', cls:'warn', title:'Inverter check on Saturday, 9 to 11 AM', body:'Engineers will test the inverters. Expect a break of up to 30 minutes. Hybrid users switch to the grid on their own. Primary users: charge phones and cool the fridge beforehand.', when:'2 hours ago', remind:true},
+  {id:'n2', type:'Weather', cls:'acc', title:'Cloudy Sunday and Monday expected', body:'Solar output will be lower. The hub will hold extra battery in reserve. Top up before the cloudy days so your credit does not run out.', when:'Yesterday', remind:false},
+  {id:'n3', type:'Meeting', cls:'ok', title:'Residents meeting, Sunday at 4 PM', body:'Open session at the Grace Chapel hall on tariffs, the Ajo scheme and new connections. All residents are welcome.', when:'2 days ago', remind:true},
+  {id:'n4', type:'General', cls:'', title:'You can now send credit to a neighbour', body:'Open Send credit from the home screen. Your first 2 kWh always stays on your own meter.', when:'Last week', remind:false}
+];
+function unreadCount(){ return NOTICES.filter(function(n){ return !state.read[n.id]; }).length; }
+function renderNotices(){
+  var u = unreadCount();
+  document.getElementById('noticeCount').textContent = u ? ' ('+u+')' : '';
+  var h = state.offline ? '<div class="notebar info" style="margin-top:0;margin-bottom:12px"><div class="grow">Saved copy from '+state.cachedAt+'. New posts appear when you are back online.</div></div>' : '';
+  h += '<p class="hint" style="margin:0 0 12px 6px">Posts from the hub operations team. Sample notices.</p>';
+  h += NOTICES.map(function(n){
+    var unread = !state.read[n.id];
+    var acts = n.remind ? '<div class="acts"><button class="'+(state.remind[n.id]?'on':'')+'" onclick="event.stopPropagation();toggleRemind(\''+n.id+'\')">'+(state.remind[n.id]?'Reminder set':'Remind me')+'</button></div>' : '';
+    return '<div class="post'+(unread?' unread':'')+'" onclick="readNotice(\''+n.id+'\')"><div class="meta"><span class="tagchip '+n.cls+'">'+n.type+'</span><span>'+n.when+'</span></div><h3>'+n.title+'</h3><p>'+n.body+'</p>'+acts+'</div>';
+  }).join('');
+  document.getElementById('comm-notices').innerHTML = h;
+}
+function readNotice(id){ if(!state.read[id]){ state.read[id] = true; save(); renderNotices(); renderBadges(); } }
+function toggleRemind(id){ state.remind[id] = !state.remind[id]; save(); renderNotices(); toast(state.remind[id] ? 'We will remind you before it starts' : 'Reminder removed'); }
+function commTab(tab){
+  commCur = tab;
+  ['hub','badges','notices'].forEach(function(k){ document.getElementById('comm-'+k).hidden = (k!==tab); });
+  document.querySelectorAll('#commSeg button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-t')===tab); });
+}
+function renderCommunity(){
+  renderHubStats(); renderForecast(); renderLeaderboard(); renderBadges(); renderNotices(); commTab(commCur);
+}
+
+/* ---------- Home extras and shared household ---------- */
+function renderViewAs(){
+  var v = viewer(), el = document.getElementById('viewAsBar');
+  if(v.id==='m0'){ el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="notebar info"><div class="grow">Previewing as <b>'+v.name+'</b> ('+ROLE_LABEL[v.role]+')</div><button onclick="setViewAs(\'m0\')">Back to me</button></div>';
+}
+function renderHomeExtras(){ renderViewAs(); renderWxAlert(); renderHomeBalance(); renderTx('homeTx', 3); }
+function setViewAs(id){ state.viewAs = id; renderViewAs(); if(document.getElementById('screen-household').classList.contains('active')) renderHousehold(); save(); toast(id==='m0' ? 'Back to your own view' : 'Previewing as '+viewer().name.split(' ')[0]); }
+function renderHousehold(){
+  var h = '<p class="hint" style="margin:0 0 14px 6px">Add family members so they can check usage or top up when you are away. Max 5 people.</p>';
+  h += '<div class="panel"><div class="ph"><h3>Members</h3><span class="tagchip">'+state.household.length+' of 5</span></div>';
+  h += state.household.map(function(m){
+    var right = m.role==='owner' ? '<span class="tagchip acc">Account holder</span>' :
+      '<select class="rolesel" aria-label="Role for '+m.name+'" onchange="setRole(\''+m.id+'\', this.value)"><option value="topup"'+(m.role==='topup'?' selected':'')+'>Can top up</option><option value="view"'+(m.role==='view'?' selected':'')+'>View only</option></select><button class="xbtn" aria-label="Remove '+m.name+'" onclick="removeMember(\''+m.id+'\')">×</button>';
+    return '<div class="mem"><span class="avs">'+m.name.charAt(0)+'</span><span class="n">'+m.name+'<div class="s" style="font-size:12.5px;color:var(--ink-dim);font-weight:400">'+m.info+'</div></span>'+right+'</div>';
+  }).join('') + '</div>';
+  h += '<div class="panel"><div class="ph"><h3>Preview as</h3></div><div class="pills">';
+  h += state.household.map(function(m){ return '<button class="pill'+(m.id===state.viewAs?' on':'')+'" onclick="setViewAs(\''+m.id+'\')">'+m.name.split(' ')[0]+'</button>'; }).join('');
+  h += '</div><p class="hint">See how the app behaves for each person. Try Top up as a View-only member.</p></div>';
+  h += '<div class="panel"><div class="ph"><h3>What each role can do</h3></div><table class="ptable"><tr><th></th><th>View</th><th>Top up</th><th>Send credit</th><th>Manage</th></tr>'+
+    '<tr><td>Account holder</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr><tr><td>Can top up</td><td>✓</td><td>✓</td><td>–</td><td>–</td></tr><tr><td>View only</td><td>✓</td><td>–</td><td>–</td><td>–</td></tr></table></div>';
+  if(state.household.length<5){
+    h += '<div class="panel"><div class="ph"><h3>Add a member</h3></div>'+
+      '<div class="field"><label for="hhName">Name</label><input id="hhName" type="text" placeholder="e.g. Funke Lorenzo"></div>'+
+      '<div class="field"><label for="hhPhone">Phone number</label><input id="hhPhone" type="tel" placeholder="080X XXX XXXX"></div>'+
+      '<div class="field"><label for="hhRole">Role</label><select id="hhRole"><option value="topup">Can top up</option><option value="view">View only</option></select></div>'+
+      '<button class="btn btn-dark" onclick="addMember()">Send invite</button></div>';
+  }
+  document.getElementById('hhBody').innerHTML = h;
+}
+function addMember(){
+  if(!guard('manage')) return;
+  var n = document.getElementById('hhName').value.trim(), p = document.getElementById('hhPhone').value.trim();
+  if(!n){ toast('Enter a name first'); return; }
+  state.household.push({id:'m'+Date.now(), name:n, role:document.getElementById('hhRole').value, info:p||'Invite sent'});
+  save(); renderHousehold(); toast('Invite sent to '+n.split(' ')[0]);
+}
+function setRole(id, role){
+  if(!guard('manage')){ renderHousehold(); return; }
+  state.household.forEach(function(m){ if(m.id===id) m.role = role; });
+  save(); renderHousehold();
+}
+function removeMember(id){
+  if(!guard('manage')) return;
+  state.household = state.household.filter(function(m){ return m.id!==id; });
+  if(state.viewAs===id) state.viewAs = 'm0';
+  save(); renderHousehold(); renderViewAs();
+}
+
+/* ---------- Appliance estimator ---------- */
+var APPL = [
+  {id:'led', n:'LED bulb', w:9, h:6, q:4},
+  {id:'cfan', n:'Ceiling fan', w:60, h:8, q:1},
+  {id:'sfan', n:'Standing fan', w:50, h:8, q:1},
+  {id:'fridge', n:'Fridge (average draw)', w:90, h:24, q:1},
+  {id:'freezer', n:'Chest freezer (average draw)', w:120, h:24, q:1},
+  {id:'tv', n:'Television', w:80, h:5, q:1},
+  {id:'phone', n:'Phone charger', w:10, h:3, q:2},
+  {id:'laptop', n:'Laptop', w:60, h:6, q:1},
+  {id:'router', n:'Wi-Fi router', w:12, h:24, q:1},
+  {id:'sew', n:'Sewing machine', w:90, h:4, q:1},
+  {id:'blend', n:'Blender', w:350, h:0.5, q:1},
+  {id:'iron', n:'Pressing iron', w:1000, h:1, q:1},
+  {id:'pump', n:'Water pump', w:750, h:1, q:1},
+  {id:'ac', n:'Air conditioner (1 HP)', w:900, h:6, q:1}
+];
+function applState(id){
+  if(!state.appl) state.appl = {sfan:{on:true}, fridge:{on:true}};
+  var d = null; APPL.forEach(function(a){ if(a.id===id) d = a; });
+  var s = state.appl[id] || {};
+  return {on:!!s.on, q:s.q||d.q, h:s.h||d.h};
+}
+function setAppl(id, patch){
+  if(!state.appl) state.appl = {};
+  var cur = applState(id); Object.keys(patch).forEach(function(k){ cur[k] = patch[k]; });
+  state.appl[id] = cur; renderAppl(true);
+}
+function stepAppl(id, key, dir){
+  var cur = applState(id), a = APPL.filter(function(x){return x.id===id;})[0];
+  if(key==='q') setAppl(id, {q:Math.max(1, Math.min(10, cur.q+dir))});
+  else { var step = a.h<2 ? 0.5 : 1; setAppl(id, {h:Math.max(0.5, Math.min(24, cur.h+dir*step))}); }
+}
+function presetAppl(name){
+  var sets = {fanfridge:{sfan:{on:true},fridge:{on:true}}, shop:{fridge:{on:true},freezer:{on:true},led:{on:true},tv:{on:true},phone:{on:true},router:{on:true}}, clear:{}};
+  state.appl = sets[name] || {}; renderAppl(true);
+}
+function fmtDur(hours){ return hours>=48 ? (hours/24).toFixed(1)+' days' : (hours>=10 ? Math.round(hours) : hours.toFixed(1))+' hours'; }
+function renderAppl(keepScroll){
+  var scroller = document.getElementById('applBody'), top = scroller.scrollTop;
+  var totalW = 0, dayKwh = 0, any = false;
+  APPL.forEach(function(a){ var s = applState(a.id); if(s.on){ any = true; totalW += a.w*s.q; dayKwh += a.w*s.q*s.h/1000; } });
+  var kW = totalW/1000, balK = state.balance/TARIFF, limit = CONN_LIMIT[state.connType];
+  var over = kW > limit, pct = Math.min(100, Math.round(kW/limit*100));
+  var h = '<div class="result"><div class="panel">';
+  if(!any){
+    h += '<h3>Switch on an appliance</h3><p class="hint" style="margin-top:6px">Turn on what you run at the same time to see the cost and how long your credit lasts.</p>';
+  } else {
+    h += '<div class="res2"><div><div class="k">Running together</div><div class="big">'+totalW.toLocaleString('en-NG')+' W</div></div><div><div class="k">Cost per hour</div><div class="big">₦'+Math.round(kW*TARIFF).toLocaleString('en-NG')+'</div></div></div>';
+    h += '<div class="gauge'+(over?' over':'')+'" role="img" aria-label="Load against connection limit"><i style="width:'+pct+'%"></i></div>';
+    h += '<div style="font-size:13.5px;line-height:1.45">'+(over
+      ? '<b style="color:var(--warn)">Over your '+limit+' kW limit.</b> The meter will trip. Switch off the heaviest item.'
+      : '<b style="color:var(--ok)">Fits your '+limit+' kW limit.</b> These run together.')+'</div>';
+    h += '<div class="res2" style="margin-top:10px"><div><div class="k">Credit lasts, running non-stop</div><div style="font-weight:700">'+fmtDur(balK/kW)+'</div></div><div><div class="k">On your planned hours</div><div style="font-weight:700">'+(dayKwh>0 ? fmtDur(balK/dayKwh*24)+' · ₦'+Math.round(dayKwh*TARIFF).toLocaleString('en-NG')+'/day' : '–')+'</div></div></div>';
+  }
+  h += '</div></div>';
+  h += '<div class="pills" style="margin:6px 0 4px"><button class="pill" onclick="presetAppl(\'fanfridge\')">Fan and fridge</button><button class="pill" onclick="presetAppl(\'shop\')">Small shop</button><button class="pill" onclick="presetAppl(\'clear\')">Clear all</button></div>';
+  h += '<div class="panel" style="padding-top:6px;padding-bottom:6px">';
+  h += APPL.map(function(a){
+    var s = applState(a.id);
+    var ctl = s.on ? '<div class="ctl"><div>Qty <span class="stepper"><button aria-label="Fewer '+a.n+'" onclick="stepAppl(\''+a.id+'\',\'q\',-1)">−</button><span>'+s.q+'</span><button aria-label="More '+a.n+'" onclick="stepAppl(\''+a.id+'\',\'q\',1)">+</button></span></div><div>Hours a day <span class="stepper"><button aria-label="Fewer hours" onclick="stepAppl(\''+a.id+'\',\'h\',-1)">−</button><span>'+s.h+'</span><button aria-label="More hours" onclick="stepAppl(\''+a.id+'\',\'h\',1)">+</button></span></div></div>' : '';
+    return '<div class="ap"><div class="r"><div><div class="n">'+a.n+'</div><div class="s">'+a.w+' W each</div></div><label class="switch"><input type="checkbox" '+(s.on?'checked':'')+' onchange="setAppl(\''+a.id+'\',{on:this.checked})" aria-label="'+a.n+'"><span class="trk"></span></label></div>'+ctl+'</div>';
+  }).join('') + '</div>';
+  h += '<p class="hint" style="padding:4px 6px 20px">Typical figures. Check the label on your own appliances. Your connection limit is '+limit+' kW ('+planName()+', demo value).</p>';
+  scroller.innerHTML = h;
+  if(keepScroll) scroller.scrollTop = top;
+}
+
+/* ---------- Offline, low data, alerts, USSD ---------- */
+function stamp(){ return new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'}); }
+function setOffline(v){
+  state.offline = !!v;
+  document.getElementById('netbar').hidden = !state.offline;
+  document.getElementById('netbarText').textContent = 'Offline · saved data from '+state.cachedAt;
+  if(!state.offline){
+    state.cachedAt = stamp();
+    if(state.queued.length){ var n = state.queued.length; state.queued = []; toast('Back online. '+n+' saved alert'+(n>1?'s':'')+' sent.'); }
+    else toast('Back online');
+  } else toast('Offline mode on. Balance and notices use saved data.');
+  renderOffline(); renderNotices();
+}
+function setLowData(v){
+  state.lowData = !!v;
+  document.getElementById('shell').classList.toggle('lowdata', state.lowData);
+  save(); toast(state.lowData ? 'Low-data mode on' : 'Low-data mode off');
+}
+function renderOffline(){
+  document.getElementById('lowDataSw').checked = state.lowData;
+  document.getElementById('offlineSw').checked = state.offline;
+  var q = state.queued.length;
+  var chip = document.getElementById('alertQueue');
+  chip.textContent = q ? q+' waiting to send' : 'Ready';
+  chip.className = 'tagchip '+(q?'warn':'ok');
+}
+function sendAlert(){
+  var issue = document.getElementById('alertIssue').value;
+  if(state.offline){
+    state.queued.push({issue:issue, at:stamp()});
+    renderOffline(); toast('Saved. It sends by SMS as soon as you have signal.');
+  } else {
+    var no = 'LRZ-'+(2000+Math.floor(Math.random()*900));
+    toast('Alert sent. Ticket '+no+'. A technician will call you.');
+  }
+}
+var ussdSt = null;
+function ussdEls(){ return {box:document.getElementById('ussd'), scr:document.getElementById('ussdScr'), inp:document.getElementById('ussdIn'), btn:document.getElementById('ussdSend')}; }
+function ussdShow(text, step, placeholder, keep){
+  var e = ussdEls(); ussdSt = {step:step, data:(ussdSt&&keep)?ussdSt.data:{}};
+  e.scr.textContent = text; e.inp.hidden = (step==='end'); e.inp.value = ''; e.inp.placeholder = placeholder||'';
+  e.btn.textContent = step==='end' ? 'OK' : 'Send';
+  if(step!=='end') setTimeout(function(){ try{ e.inp.focus(); }catch(err){} }, 30);
+}
+function openUssd(code){
+  var e = ussdEls(); e.box.hidden = false;
+  ussdShow('Dial a Lorenzo code.\nTry *347# for the menu.', 'dial', '*347#');
+  if(code) e.inp.value = code;
+}
+function closeUssd(){ ussdEls().box.hidden = true; ussdSt = null; }
+var USSD_MENU = 'Lorenzo\n1. Check balance\n2. Top up\n3. Last tokens\n4. Report a fault';
+function ussdRoute(c, amt){
+  if(c===undefined){ ussdShow(USSD_MENU, 'menu', 'Reply 1-4'); return; }
+  if(c==='1'){ ussdShow('Balance\n₦'+Math.floor(state.balance).toLocaleString('en-NG')+' ('+(state.balance/TARIFF).toFixed(1)+' kWh)\nTariff ₦'+TARIFF+'/kWh', 'end'); return; }
+  if(c==='2'){
+    if(amt){ ussdConfirm(parseInt(amt,10)); return; }
+    ussdShow('Enter amount in naira (min 100)', 'amount', 'e.g. 1000'); return;
+  }
+  if(c==='3'){
+    var rows = txData.slice(0,3).map(function(x){ return x.sub.split(',')[0]+'  '+fmtNaira(x.amt); }).join('\n');
+    ussdShow('Last tokens\n'+rows, 'end'); return;
+  }
+  if(c==='4'){ ussdShow('Report a fault\n1. No power\n2. Low voltage\n3. Meter fault', 'fault', 'Reply 1-3'); return; }
+  ussdShow('Invalid choice.', 'end');
+}
+function ussdConfirm(a){
+  if(!(a>=100)){ ussdShow('Invalid amount. Minimum is ₦100.', 'end'); return; }
+  ussdShow('Top up ₦'+a.toLocaleString('en-NG')+' ('+(a/TARIFF).toFixed(1)+' kWh)?\n1. Yes\n2. No', 'confirm', 'Reply 1 or 2');
+  ussdSt.data.amt = a;
+}
+function ussdSend(){
+  var e = ussdEls(), v = e.inp.value.trim(), st = ussdSt;
+  if(!st) return;
+  if(st.step==='end'){ closeUssd(); return; }
+  if(st.step==='dial'){
+    var m = v.match(/^\*347(?:\*(\d)(?:\*(\d+))?)?#$/);
+    if(!m){ ussdShow('Connection problem or invalid code.', 'end'); return; }
+    ussdRoute(m[1], m[2]); return;
+  }
+  if(st.step==='menu'){ ussdRoute(v); return; }
+  if(st.step==='amount'){ ussdConfirm(parseInt(v,10)); return; }
+  if(st.step==='confirm'){
+    var a = st.data.amt;
+    if(v==='1'){
+      state.balance += a; addTx('Top-up (USSD)', a, 'topup');
+      refreshBalanceViews();
+      ussdShow('Top-up of ₦'+a.toLocaleString('en-NG')+' successful.\nNew balance: ₦'+Math.floor(state.balance).toLocaleString('en-NG')+' ('+(state.balance/TARIFF).toFixed(1)+' kWh)', 'end');
+    } else ussdShow('Cancelled.', 'end');
+    return;
+  }
+  if(st.step==='fault'){
+    var names = {'1':'No power','2':'Low voltage','3':'Meter fault'};
+    if(!names[v]){ ussdShow('Invalid choice.', 'end'); return; }
+    ussdShow('Fault logged: '+names[v]+'.\nTicket LRZ-'+(2000+Math.floor(Math.random()*900))+'.\nA technician will call you.', 'end');
+  }
+}
+
+
+/* ---------- Notifications ---------- */
+var NOTIF_ICON = {
+  ok:'<path d="M4 12l6 6L20 6"/>',
+  warn:'<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'
+};
+function seedNotifs(){
+  return [
+    {id:'s1',type:'ok',title:'Power restored',body:'Your line is back on solar supply after a 40-minute outage.',time:'Today, 2:14 PM',read:false},
+    {id:'s2',type:'warn',title:'Outage on the main grid',body:'Your Hybrid connection switched to the solar hub automatically.',time:'Today, 1:34 PM',read:false},
+    {id:'s3',type:'warn',title:'Balance running low',body:'₦320 left (about 1.8 kWh). Top up to avoid disconnection.',time:'Oct 26, 8:40 PM',read:true},
+    {id:'s4',type:'ok',title:'Top-up successful',body:'₦2,000 added. 11.1 kWh credited to your meter.',time:'Yesterday, 6:15 PM',read:true},
+    {id:'s5',type:'info',title:'Welcome to Lorenzo',body:'Meter LRZ-OG-0142 is active and solar supply is online.',time:'Oct 22, 9:02 AM',read:true}
+  ];
+}
+function notifs(){ if(!Array.isArray(state.notifs)) state.notifs = seedNotifs(); return state.notifs; }
+function notifEsc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function renderBellBadge(){
+  var b = document.getElementById('bellBadge'); if(!b) return;
+  var n = notifs().filter(function(x){ return !x.read; }).length;
+  b.hidden = n===0; b.textContent = n>9 ? '9+' : n;
+}
+function renderNotifs(){
+  var list = notifs(), el = document.getElementById('notifList');
+  var unread = list.filter(function(x){ return !x.read; }).length;
+  document.getElementById('nCount').textContent = unread ? unread+' unread' : 'All read';
+  document.getElementById('nMarkAll').disabled = unread===0;
+  document.getElementById('nEmpty').hidden = list.length>0;
+  el.hidden = list.length===0;
+  el.innerHTML = list.map(function(n){
+    var open = n._open;
+    return '<div class="notif'+(n.read?'':' unread')+'" data-id="'+n.id+'" onclick="openNotif(\''+n.id+'\')">'+
+      '<div class="nicon '+n.type+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+NOTIF_ICON[n.type]+'</svg></div>'+
+      '<div class="nbody"><div class="t1">'+notifEsc(n.title)+'</div><div class="t2'+(open?'':' clamp')+'">'+notifEsc(n.body)+'</div><div class="t3">'+notifEsc(n.time)+'</div></div>'+
+      '<button class="ndel" aria-label="Delete notification" onclick="event.stopPropagation();deleteNotif(\''+n.id+'\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>'+
+    '</div>';
+  }).join('');
+  renderBellBadge(); renderWxAlert();
+}
+function openNotif(id){
+  notifs().forEach(function(n){ if(n.id===id){ n._open = !n._open; n.read = true; } else { n._open = false; } });
+  save(); renderNotifs();
+}
+function markAllNotifs(){ notifs().forEach(function(n){ n.read = true; }); save(); renderNotifs(); toast('All marked as read'); }
+function deleteNotif(id){
+  state.notifs = notifs().filter(function(n){ return n.id!==id; });
+  save(); renderNotifs(); toast('Notification deleted');
+}
+function toggleNotifForm(){
+  var f = document.getElementById('nForm'); f.hidden = !f.hidden;
+  if(!f.hidden){ document.getElementById('nfTitle').value=''; document.getElementById('nfBody').value=''; document.getElementById('nfTitle').focus(); }
+}
+function addNotif(){
+  var t = document.getElementById('nfTitle').value.trim(), b = document.getElementById('nfBody').value.trim();
+  if(!t){ toast('Add a title first'); return; }
+  var d = new Date(), h = d.getHours()%12||12, m = ('0'+d.getMinutes()).slice(-2);
+  notifs().unshift({id:'u'+Date.now(), type:document.getElementById('nfType').value, title:t, body:b||'No details added.', time:'Today, '+h+':'+m+' '+(d.getHours()<12?'AM':'PM'), read:false});
+  document.getElementById('nForm').hidden = true;
+  save(); renderNotifs(); toast('Notification added');
+}
+
+
+/* ---------- Theme ---------- */
+function themeMode(){ try{ return localStorage.getItem('lorenzo_theme')||'system'; }catch(e){ return 'system'; } }
+function applyTheme(m){
+  var r = document.documentElement;
+  if(m==='light'||m==='dark') r.setAttribute('data-theme', m); else r.removeAttribute('data-theme');
+  document.querySelectorAll('#themeSeg button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-m')===m); });
+}
+function setTheme(m){ try{ localStorage.setItem('lorenzo_theme', m); }catch(e){} applyTheme(m); }
+function effectiveDark(){
+  var m = themeMode();
+  return m==='dark' || (m==='system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+}
+function toggleTheme(){ var d = effectiveDark(); setTheme(d?'light':'dark'); toast(d?'Light mode':'Dark mode'); }
+applyTheme(themeMode());
+
+
+var TX_DESC = {
+  usage:'Energy used from your meter, deducted from your balance.',
+  topup:'Credit added to your meter from your wallet or card.',
+  conn:'One-time connection fee for your Lorenzo line.',
+  gift:'Credit shared with another household on your street.',
+  ajo:'Contribution to your street Ajo savings group.',
+  auto:'Automatic top-up that ran when your balance dropped.'
+};
+var TX_METHOD = {usage:'Meter balance', topup:'Card or wallet', conn:'Card', gift:'Meter credit', ajo:'Wallet', auto:'Wallet (auto top-up)'};
+var txSeq = 0;
+function txId(x){
+  if(!x.id){ txSeq++; x.id = 'tx'+Date.now().toString(36)+txSeq; x.ref = 'LRZ-TX-'+(100000+Math.floor(Math.random()*899999)); }
+  return x.id;
+}
+function openTx(id){
+  var x = txData.filter(function(t){ return t.id===id; })[0]; if(!x) return;
+  var kind = x.kind, abs = Math.abs(x.amt);
+  document.getElementById('txmIcon').className = 'txicon '+kind;
+  document.getElementById('txmIcon').innerHTML = txIcon(kind);
+  document.getElementById('txmTitle').textContent = x.label;
+  document.getElementById('txmSub').textContent = x.sub;
+  var amt = document.getElementById('txmAmt'); amt.textContent = fmtNaira(x.amt); amt.className = 'txm-amt tnum'+(x.amt>0?' pos':'');
+  document.getElementById('txmStatus').innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l6 6L20 6"/></svg>Completed';
+  var rows = [['Type', TX_DESC[kind] ? x.label : x.label],['Details', TX_DESC[kind]||''],['Energy', kind==='conn'||kind==='ajo' ? '–' : (abs/TARIFF).toFixed(1)+' kWh at ₦'+TARIFF+'/kWh'],['Paid with', TX_METHOD[kind]||'–'],['Reference', x.ref],['Meter','LRZ-OG-0142']];
+  document.getElementById('txmRows').innerHTML = rows.map(function(r){ return '<div class="txm-row"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>'; }).join('');
+  var act = '<button class="btn" style="background:var(--card-soft);color:var(--ink)" onclick="copyTxRef(\''+x.ref+'\')">Copy reference</button>';
+  act += (kind==='topup'||kind==='auto') ? '<button class="btn btn-dark" onclick="closeTx();go(\'screen-topup\')">Top up again</button>' : '<button class="btn btn-dark" onclick="closeTx()">Done</button>';
+  document.getElementById('txmActions').innerHTML = act;
+  document.getElementById('txModal').hidden = false;
+}
+function closeTx(){ var m = document.getElementById('txModal'); if(m) m.hidden = true; }
+function copyTxRef(r){
+  try{ navigator.clipboard.writeText(r).then(function(){ toast('Reference copied'); }, function(){ toast('Reference: '+r); }); }catch(e){ toast('Reference: '+r); }
+}
+
+
+/* ---------- Profile photo, characters and editing ---------- */
+var CHARS = [
+  {bg:['#FFE0B0','#FF9A6B'], skin:'#8D5A3C', hair:'#1D1B1A', style:'afro',   shirt:'#EF6A3A', acc:'sun'},
+  {bg:['#FFF0B8','#F5B83A'], skin:'#C68A5E', hair:'#2B1B14', style:'short',  shirt:'#1D1B1A', acc:'bolt'},
+  {bg:['#CDEBD9','#6FC79A'], skin:'#5E3A26', hair:'#1D1B1A', style:'gele',   shirt:'#F5F0EA', acc:'sun'},
+  {bg:['#FBDAC8','#EF6A3A'], skin:'#A06A47', hair:'#3A2418', style:'cap',    shirt:'#3E9E68', acc:'bolt'},
+  {bg:['#D8E6FF','#8FB4F5'], skin:'#E0AC82', hair:'#4A2E1C', style:'bun',    shirt:'#EF6A3A', acc:'sun'},
+  {bg:['#FFF3C9','#FFC93A'], skin:'#3F2618', hair:'#0F0D0C', style:'twists', shirt:'#1D1B1A', acc:'bolt'}
+];
+function charSVG(i){
+  var c = CHARS[i%CHARS.length], id = 'cg'+i+'_'+Math.floor(Math.random()*1e6), o = '';
+  o += '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sunny character"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c.bg[0]+'"/><stop offset="1" stop-color="'+c.bg[1]+'"/></linearGradient></defs>';
+  o += '<rect width="80" height="80" fill="url(#'+id+')"/>';
+  // sun rays behind head
+  var rays = '';
+  for(var k=0;k<12;k++){ var a = k*Math.PI/6, x1 = 40+Math.cos(a)*23, y1 = 36+Math.sin(a)*23, x2 = 40+Math.cos(a)*31, y2 = 36+Math.sin(a)*31;
+    rays += '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'"/>'; }
+  o += '<g stroke="#FFC93A" stroke-width="3" stroke-linecap="round" opacity=".95">'+rays+'</g>';
+  // body
+  o += '<ellipse cx="40" cy="80" rx="27" ry="19" fill="'+c.shirt+'"/><rect x="35" y="48" width="10" height="9" rx="3" fill="'+c.skin+'"/>';
+  // hair behind
+  if(c.style==='afro') o += '<circle cx="40" cy="32" r="19" fill="'+c.hair+'"/>';
+  if(c.style==='bun') o += '<circle cx="40" cy="15" r="6.5" fill="'+c.hair+'"/>';
+  if(c.style==='twists'){ for(var t=0;t<7;t++){ o += '<rect x="'+(23+t*5.6).toFixed(1)+'" y="'+(16+Math.abs(t-3)*1.6).toFixed(1)+'" width="4" height="'+(18-Math.abs(t-3)*0).toFixed(0)+'" rx="2" fill="'+c.hair+'"/>'; } }
+  // head
+  o += '<circle cx="40" cy="37" r="15" fill="'+c.skin+'"/>';
+  // hair front
+  if(c.style==='afro'||c.style==='short'||c.style==='bun') o += '<path d="M25.5 36 Q25 21 40 21 Q55 21 54.5 36 Q50 28.5 40 28.5 Q30 28.5 25.5 36Z" fill="'+c.hair+'"/>';
+  if(c.style==='twists') o += '<path d="M25.5 34 Q26 22 40 22 Q54 22 54.5 34 Q48 28 40 28 Q32 28 25.5 34Z" fill="'+c.hair+'"/>';
+  if(c.style==='gele'){ o += '<ellipse cx="40" cy="25" rx="18" ry="9" fill="#EF6A3A"/><path d="M24 25 Q40 14 56 25" fill="none" stroke="#FFC93A" stroke-width="2.5" stroke-linecap="round"/><circle cx="55" cy="19" r="5" fill="#EF6A3A"/><circle cx="55" cy="19" r="2" fill="#FFC93A"/>'; }
+  if(c.style==='cap'){ o += '<path d="M25 33 Q25 19 40 19 Q55 19 55 33Z" fill="#FFC93A"/><path d="M52 31 H64 Q64 35 58 35 H52Z" fill="#E5A81F"/><circle cx="40" cy="19.5" r="2" fill="#E5A81F"/>'; }
+  // face
+  o += '<circle cx="34.5" cy="38" r="1.9" fill="#1D1B1A"/><circle cx="45.5" cy="38" r="1.9" fill="#1D1B1A"/>';
+  o += '<path d="M34 43.5 Q40 49.5 46 43.5" fill="none" stroke="#1D1B1A" stroke-width="2.1" stroke-linecap="round"/>';
+  o += '<circle cx="30.5" cy="43" r="2.4" fill="#EF6A3A" opacity=".28"/><circle cx="49.5" cy="43" r="2.4" fill="#EF6A3A" opacity=".28"/>';
+  // accessory
+  if(c.acc==='sun') o += '<g><circle cx="65" cy="15" r="6.5" fill="#FFC93A"/><g stroke="#FFC93A" stroke-width="2" stroke-linecap="round"><line x1="65" y1="4" x2="65" y2="6"/><line x1="76" y1="15" x2="74" y2="15"/><line x1="73" y1="7" x2="71.5" y2="8.5"/><line x1="57" y1="7" x2="58.5" y2="8.5"/><line x1="54" y1="15" x2="56" y2="15"/></g></g>';
+  else o += '<g><circle cx="64" cy="64" r="10" fill="#FFC93A"/><path d="M66 55 L59 65 H64 L62 73 L70 62 H65 Z" fill="#171514"/></g>';
+  return o+'</svg>';
+}
+function avatarInner(a, initial){
+  a = a||{};
+  if(a.type==='photo' && a.photo) return '<img src="'+a.photo+'" alt="Profile photo">';
+  if(a.type==='char') return charSVG(a.char||0);
+  return initial;
+}
+function paintAvatars(){
+  var name = (state.name||'L').trim(), init = name.charAt(0).toUpperCase()||'L', html = avatarInner(state.avatar, init);
+  var big = document.getElementById('avatarInit'); if(big) big.innerHTML = '<span class="av-in">'+html+'</span>';
+  var m = document.getElementById('mcInit'); if(m) m.innerHTML = html;
+}
+var epDraft = null;
+function openEditProfile(){
+  var a = state.avatar||{type:'initial'};
+  epDraft = {type:a.type||'initial', char:a.char||0, photo:a.photo||null};
+  document.getElementById('epName').value = state.name||'';
+  document.getElementById('epPhone').value = state.phone||'';
+  document.getElementById('epStreet').value = state.street||'';
+  renderEpAvatar();
+  document.getElementById('editModal').hidden = false;
+}
+function renderEpAvatar(){
+  var name = (document.getElementById('epName').value||state.name||'L').trim(), init = name.charAt(0).toUpperCase()||'L';
+  document.getElementById('epPreview').innerHTML = avatarInner(epDraft, init);
+  document.getElementById('epChars').innerHTML = CHARS.map(function(_,i){
+    return '<button aria-label="Character '+(i+1)+'" class="'+(epDraft.type==='char'&&epDraft.char===i?'on':'')+'" onclick="pickChar('+i+')">'+charSVG(i)+'</button>';
+  }).join('');
+}
+function pickChar(i){ epDraft.type='char'; epDraft.char=i; renderEpAvatar(); }
+function useInitial(){ epDraft.type='initial'; renderEpAvatar(); }
+function pickPhoto(inp){
+  var f = inp.files && inp.files[0]; if(!f) return;
+  if(!/^image\//.test(f.type)){ toast('Please choose an image'); return; }
+  var r = new FileReader();
+  r.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+      var m = Math.min(img.width, img.height), sx = (img.width-m)/2, sy = (img.height-m)/2;
+      c.getContext('2d').drawImage(img, sx, sy, m, m, 0, 0, S, S);
+      epDraft.type='photo'; epDraft.photo = c.toDataURL('image/jpeg', .82); renderEpAvatar();
+    };
+    img.onerror = function(){ toast('Could not read that image'); };
+    img.src = r.result;
+  };
+  r.readAsDataURL(f); inp.value='';
+}
+function closeEditProfile(){ var m = document.getElementById('editModal'); if(m) m.hidden = true; }
+function saveEditProfile(){
+  var n = document.getElementById('epName').value.trim();
+  if(!n){ toast('Name cannot be empty'); return; }
+  state.name = n;
+  state.phone = document.getElementById('epPhone').value.trim() || state.phone;
+  state.street = document.getElementById('epStreet').value.trim() || state.street;
+  state.avatar = epDraft;
+  applyProfile(); save(); closeEditProfile(); toast('Profile updated');
+}
+
+/* ---------- Misc ---------- */
+var toastTimer;
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+function resetApp(){
+  try{ localStorage.removeItem('lorenzo_state_v3'); }catch(e){}
+  state.onboarded = false; state.viewAs = 'm0';
+  obGo(0);
+  go('screen-splash');
+}
+var SAVE_KEYS = ['onboarded','connType','balance','name','phone','street','lang','voiceSlow','lowData','household','viewAs','auto','ajo','ajoCount','gifted','read','remind','notifs','dismissed','avatar'];
+function save(){
+  try{ var o = {}; SAVE_KEYS.forEach(function(k){ o[k] = state[k]; }); localStorage.setItem('lorenzo_state_v3', JSON.stringify(o)); }catch(e){}
+}
+function load(){
+  try{
+    var raw = localStorage.getItem('lorenzo_state_v3');
+    if(!raw) return false;
+    var s = JSON.parse(raw);
+    if(!s || !s.onboarded) return false;
+    SAVE_KEYS.forEach(function(k){ if(s[k]!==undefined && s[k]!==null) state[k] = s[k]; });
+    return true;
+  }catch(e){}
+  return false;
+}
+function syncControls(){
+  document.getElementById('shell').classList.toggle('lowdata', !!state.lowData);
+  document.getElementById('netbar').hidden = !state.offline;
+}
+function init(){
+  state.cachedAt = stamp();
+  var resumed = load();
+  initOnboardSwipe();
+  renderAmtGrid();
+  updateTopupUI();
+  updatePaymentSummary();
+  renderChart();
+  renderTx('activityTx', 0, 'all');
+  syncControls();
+  applyProfile();
+  applyI18n();
+  renderHomeExtras(); renderBellBadge();
+  if(resumed){
+    selectConn(state.connType);
+    go('screen-home');
+  }
+}
+if (window.claude && window.claude.hot) {
+  window.claude.hot.ready ? window.claude.hot.ready(init) : init();
+} else {
+  init();
+}
+
+/* ---------- Side menu ---------- */
+function openMenu(){
+  var n=document.getElementById('homeName'), pl=document.getElementById('mcPlan');
+  if(n) document.getElementById('drawerName').textContent=n.textContent;
+  if(pl) document.getElementById('drawerPlan').textContent=pl.textContent;
+  var d=document.getElementById('drawer'); d.hidden=false;
+  var b=d.querySelector('.ditem'); if(b) b.focus();
+}
+function closeMenu(){ var d=document.getElementById('drawer'); if(d) d.hidden=true; }
+function menuGo(id){ closeMenu(); go(id); }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeMenu(); closeTx(); closeEditProfile(); } });
+</script>
